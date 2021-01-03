@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/_10sdp"
+    android:layoutDirection="rtl"
+    android:background="@android:color/white"
+    android:layout_marginBottom="@dimen/_10sdp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/subdep_name"
+        android:textSize="@dimen/_15ssp"
+        android:text="خضروات"
+        android:textStyle="bold"
+        android:paddingStart="@dimen/_50sdp"
+        android:fontFamily="@font/arabic_font" />
+</LinearLayout>

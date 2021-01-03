@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_margin="@dimen/_5sdp"
+    app:cardCornerRadius="@dimen/_10sdp">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/_5sdp"
+        android:layoutDirection="rtl">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/_5sdp"
+            android:id="@+id/minimum_layout"
+            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="الحد الأدنى:"
+                android:textSize="@dimen/_15ssp"
+                android:layout_marginEnd="@dimen/_5sdp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1000"
+                android:id="@+id/minimum"
+                android:textSize="@dimen/_25ssp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginEnd="@dimen/_5sdp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="جنيه"
+                android:textSize="@dimen/_15ssp"
+                android:textColor="@color/colorAccent"
+                android:layout_marginEnd="@dimen/_5sdp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/_5sdp"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/minimum_layout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="الخصــــــــم:"
+                android:textSize="@dimen/_15ssp"
+                android:layout_marginEnd="@dimen/_5sdp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1000"
+                android:id="@+id/discount"
+                android:textSize="@dimen/_25ssp"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginEnd="@dimen/_5sdp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="جنيه"
+                android:id="@+id/discount_type"
+                android:textSize="@dimen/_15ssp"
+                android:textColor="@color/colorAccent"
+                android:layout_marginEnd="@dimen/_5sdp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/delete_button_background"
+            android:layout_margin="@dimen/_5sdp"
+            android:src="@drawable/ic_close"
+            android:layout_alignParentTop="true"
+            android:padding="@dimen/_5sdp"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/delete" />
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

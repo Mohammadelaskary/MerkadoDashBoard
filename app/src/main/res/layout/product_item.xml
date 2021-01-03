@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:layout_height="@dimen/_250sdp"
+    android:layout_width="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="@dimen/_5sdp"
+    app:cardCornerRadius="@dimen/_10sdp"
+    android:layoutDirection="rtl">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="خصم 2.00 جنيه"
+            android:layout_alignParentTop="true"
+            android:textSize="@dimen/_10ssp"
+            android:background="@drawable/discount_background"
+            android:paddingTop="@dimen/_1sdp"
+            android:paddingBottom="@dimen/_1sdp"
+            android:paddingStart="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_5sdp"
+            android:textColor="@android:color/white"
+            android:id="@+id/discount"
+            android:visibility="visible"
+            android:layout_alignParentEnd="true" />
+
+
+        <RelativeLayout
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:layout_centerInParent="true">
+
+            <ImageView
+                android:layout_width="@dimen/_110sdp"
+                android:layout_height="@dimen/_110sdp"
+                android:id="@+id/product_image"
+                android:layout_centerInParent="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/empty_edit_text"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="طماطم"
+                android:layout_below="@id/product_image"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="@dimen/_7sdp"
+                android:textSize="@dimen/_15ssp"
+                android:id="@+id/product_name"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15.00 جنيه / كيلو"
+                android:layout_below="@id/product_name"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="@dimen/_6sdp"
+                android:textSize="@dimen/_12ssp"
+                android:background="@drawable/price_background"
+                android:padding="@dimen/_7sdp"
+                android:textColor="@android:color/white"
+                android:id="@+id/final_price"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="بدلا من 17.00 جنيه"
+                android:textSize="@dimen/_12ssp"
+                android:layout_below="@id/final_price"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_alignEnd="@id/final_price"
+                android:visibility="visible"
+                android:id="@+id/price_before_discount" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="حذف"
+                android:background="@drawable/delete_button_background"
+                android:textColor="@android:color/white"
+                android:layout_centerInParent="true"
+                android:layout_below="@id/price_before_discount"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:id="@+id/delete" />
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="#AB000000"
+        android:background="@drawable/empty_edit_text"
+        android:id="@+id/unavailable_image"
+        android:visibility="gone" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="غير متاح مؤقتا"
+        android:layout_gravity="center"
+        android:textSize="@dimen/_15ssp"
+        android:paddingTop="@dimen/_1sdp"
+        android:paddingBottom="@dimen/_1sdp"
+        android:paddingStart="@dimen/_5sdp"
+        android:paddingEnd="@dimen/_5sdp"
+        android:textColor="@android:color/white"
+        android:id="@+id/unavailable"
+        android:visibility="gone" />
+</androidx.cardview.widget.CardView>

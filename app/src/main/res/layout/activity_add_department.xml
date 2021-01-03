@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Views.AddDepartment"
+    android:orientation="vertical"
+    android:layoutDirection="rtl">
+
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?android:progressBarStyleLarge"
+        android:layout_centerInParent="true"
+        android:visibility="visible"
+        android:id="@+id/progress_bar" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/no_internet"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_40ssp"
+            android:textColor="@color/grey"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:id="@+id/no_internet_text"
+            android:text="تأكد من الاتصال بالانترنت"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:id="@+id/add_dep_layout"
+        android:visibility="visible">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:id="@+id/department_name"
+            android:background="@drawable/button_background"
+            android:paddingStart="@dimen/_10sdp"
+            android:paddingEnd="@dimen/_10sdp"
+            app:errorEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="اسم القســـــم"
+                android:background="@drawable/empty_edit_text"
+                android:padding="@dimen/_5sdp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/add_button_background"
+            android:padding="@dimen/_10sdp"
+            android:layout_margin="@dimen/_10sdp"
+            android:elevation="@dimen/_30sdp"
+            android:text="إضـــــافــة"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/_15ssp"
+            android:id="@+id/add" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="الأقســــــام الموجــودة:"
+            android:layout_margin="@dimen/_5sdp"
+            android:id="@+id/recycler_title" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:id="@+id/no_deps"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_40ssp"
+                android:textColor="@color/grey"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:id="@+id/no_deps_text"
+                android:text="لا يوجد أقسام مضافة"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/deps_recycler"
+            android:layout_margin="@dimen/_5sdp" />
+
+    </LinearLayout>
+</RelativeLayout>

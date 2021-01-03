@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="rtl"
+    tools:context=".Views.PreOrdersActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/no_pre_orders"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="لا توجد طلبات مخزنة"
+            android:textSize="@dimen/_40ssp"
+            android:textColor="@color/grey"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:id="@+id/no_pre_orders_text"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:visibility="visible"
+        android:layoutDirection="rtl"
+        android:gravity="start"
+        android:id="@+id/date_layout"
+        android:layout_margin="@dimen/_5sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="التاريخ"
+            android:textSize="@dimen/_12ssp"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:visibility="visible" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/day"
+            android:id="@+id/day"
+            android:layout_marginEnd="@dimen/_5sdp" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/month"
+            android:id="@+id/month"
+            android:layout_marginEnd="@dimen/_5sdp" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/search_options"
+            android:id="@+id/year"
+            android:layout_marginEnd="@dimen/_5sdp" />
+
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="بحث"
+        android:layout_margin="@dimen/_5sdp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/add_button_background"
+        android:id="@+id/search"
+        android:layout_below="@id/date_layout" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:id="@+id/dates_rec"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
