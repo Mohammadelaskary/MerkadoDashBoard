@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -193,6 +194,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                                     } catch (EscPosConnectionException | EscPosParserException | EscPosEncodingException | EscPosBarcodeException e) {
                                         e.printStackTrace();
                                         Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Log.d("printerError",e.getMessage());
                                     }
                                 }
 
