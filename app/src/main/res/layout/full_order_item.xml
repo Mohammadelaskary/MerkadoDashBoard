@@ -391,22 +391,11 @@
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_10sdp"
         android:layout_marginBottom="@dimen/_10sdp"
-        android:layout_toStartOf="@id/delete_order"
+        android:layout_alignParentEnd="true"
         android:background="@drawable/send_background"
         android:padding="@dimen/_10sdp"
-        android:src="@drawable/ic_send" />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_delete"
-        android:layout_margin="@dimen/_10sdp"
-        android:padding="@dimen/_10sdp"
-        android:id="@+id/delete_order"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        style="?buttonStyleSmall"
-        android:backgroundTint="#BA0404" />
+        android:src="@drawable/ic_settings" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

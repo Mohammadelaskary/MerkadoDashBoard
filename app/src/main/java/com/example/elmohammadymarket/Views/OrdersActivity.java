@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -68,6 +69,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             getData();
             adapter = new FullOrderAdapter(this, list, true, this);
             binding.fullOrderRecycler.setAdapter(adapter);
+            binding.fullOrderRecycler.setItemAnimator(new DefaultItemAnimator());
             binding.fullOrderRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, true));
             binding.fullOrderRecycler.setHasFixedSize(true);
         } else {
