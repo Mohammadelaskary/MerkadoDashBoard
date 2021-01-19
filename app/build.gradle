@@ -27,6 +27,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -71,9 +75,8 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'org.apache.poi:poi:3.12'
-
     implementation 'com.github.DantSu:ESCPOS-ThermalPrinter-Android:2.0.8'
-//    implementation 'org.apache.poi:poi-ooxml:3.12'
-//    implementation 'com.fasterxml:aalto-xml:1.0.0'
+
+
 
 }

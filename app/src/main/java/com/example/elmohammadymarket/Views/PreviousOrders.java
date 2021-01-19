@@ -10,21 +10,33 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dantsu.escposprinter.EscPosPrinter;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
+import com.dantsu.escposprinter.exceptions.EscPosBarcodeException;
+import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
+import com.dantsu.escposprinter.exceptions.EscPosEncodingException;
+import com.dantsu.escposprinter.exceptions.EscPosParserException;
+import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 import com.example.elmohammadymarket.Adapters.FullOrderAdapter;
 import com.example.elmohammadymarket.Model.FullOrder;
+import com.example.elmohammadymarket.Model.OrderProduct;
 import com.example.elmohammadymarket.OnCallClickListener;
+import com.example.elmohammadymarket.OnPrintClickListener;
 import com.example.elmohammadymarket.R;
 import com.example.elmohammadymarket.databinding.ActivityPreviousOrdersBinding;
 import com.google.firebase.database.DataSnapshot;
@@ -43,20 +55,24 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
-public class PreviousOrders extends AppCompatActivity implements OnCallClickListener {
+public class PreviousOrders extends AppCompatActivity implements OnCallClickListener, OnPrintClickListener {
 
     private static final int REQUEST_CODE_CALL = 100;
     private static final int REQUEST_CODE_SHARE = 200 ;
     private static final int REQUEST_CODE_LOCATION = 300 ;
+    private static final int PRINT_REQUEST_CODE = 400 ;
     ActivityPreviousOrdersBinding binding;
     List<FullOrder> list = new ArrayList<>();
     FullOrderAdapter adapter;
     String mobileNumber;
     String date;
+    FullOrder order;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +87,7 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
         date = intent.getStringExtra("date");
         if (isConnected()) {
             getData(date);
-            adapter = new FullOrderAdapter(this,list, false, this);
+            adapter = new FullOrderAdapter(this,list, false, this,this);
             binding.fullOrderRecycler.setAdapter(adapter);
             binding.fullOrderRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
             binding.fullOrderRecycler.setHasFixedSize(true);
@@ -267,6 +283,109 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
                 createExcelFileAndShare(date);
             }
         }
+        if (requestCode == PRINT_REQUEST_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    printOrder(order);
+                } catch (EscPosConnectionException | EscPosParserException | EscPosEncodingException | EscPosBarcodeException e) {
+                    e.printStackTrace();
+                    Log.d("print error",e.getMessage());
+                }
+            }
+        }
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onPrintClickListener(FullOrder order) {
+        this.order = order;
+        Log.d("blue","print interface");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(PreviousOrders.this, new String[]{Manifest.permission.BLUETOOTH},PRINT_REQUEST_CODE);
+        } else {
+            try {
+                printOrder(order);
+            } catch (EscPosConnectionException | EscPosParserException | EscPosEncodingException | EscPosBarcodeException e) {
+                e.printStackTrace();
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("printerError",e.getMessage());
+            }
+        }
+    }
+    private void printOrder(FullOrder fullOrder) throws EscPosConnectionException, EscPosParserException, EscPosEncodingException, EscPosBarcodeException {
+        final String customerName = fullOrder.getUsername();
+        final String address = fullOrder.getAddress();
+        final String mobileNumber = fullOrder.getMobilePhone();
+        final float sum = fullOrder.getSum();
+        final float discount = fullOrder.getDiscount();
+        final float overAllDiscount = fullOrder.getOverAllDiscount();
+        final String phoneNumber = fullOrder.getPhoneNumber();
+        final float netCost = fullOrder.getTotalCost();
+        final List<OrderProduct> list = fullOrder.getOrders();
+        final float shipping = fullOrder.getShipping();
+        String ordersPrint = getOrdersPrintText(list);
+        String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
+        Log.d("blue","print method");
+        EscPosPrinter printer = new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(), 203, 80f, 32);
+        String resetText =
+                "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, this.getApplicationContext().getResources().getDrawableForDensity(R.drawable.ic_mercado_logo_small, DisplayMetrics.DENSITY_MEDIUM))+"</img>\n"
+                        +"[C]\n"
+                        +"[C]<u><font size ='big'>ميركادو</font></u>"
+                        +"[C]\n"
+                        +"[C]_________________________"
+                        +"[C]\n"
+                        +"[R]"+timeStamp+"[R]<font size = 'big'>الوقت والتاريخ:</font>"
+                        +"[C]\n"
+                        +"[R]"+customerName+"[R]<font size = 'big'>اسم العميل:</font>"
+                        +"[C]\n"
+                        +"[R]"+mobileNumber+"[R]<font size = 'big'>رقم التليفون المحمول:</font>"
+                        +"[C]\n"
+                        +"[R]"+phoneNumber+"[R]<font size = 'big'>رقم التليفون الأرضي:</font>"
+                        +"[C]\n"
+                        +"[R]"+address+"[R]<font size = 'big'>العنوان:</font>"
+                        +"[C]\n"
+                        +"[C]_________________________"
+                        +"[C]\n"
+                        +"[L]الاجمالي[L]الكمية   [L]بعد الخصم   [L]قبل الخصم   [R]اسم الصنف"
+                        +"[C]\n"
+                        +"[C]_________________________"
+                        +"[C]\n"
+                        +ordersPrint
+                        +"[C]\n"
+                        +"[C]_________________________"
+                        +"[C]\n"
+                        +"[L]"+sum+"[R]<font size = 'big'>الإجمالي:</font>"
+                        +"[C]\n"
+                        +"[L]"+discount+"[R]<font size = 'big'>إجمالي الخصم:</font>"
+                        +"[C]\n"
+                        +"[L]"+overAllDiscount+"[R]<font size = 'big'>الخصم علي المجموع:</font>"
+                        +"[C]\n"
+                        +"[L]"+shipping+"[R]<font size = 'big'>مصاريف الشحن:</font>"
+                        +"[C]\n"
+                        +"[C]_________________________"
+                        +"[C]\n"
+                        +"[L]"+netCost+"[R]<font size = 'big'>المبلغ المطلوب:</font>"
+                        +"[C]\n"
+                        +"[C]========================="
+                        +"[C]\n"
+                        +"[C]01101515954[C]<font size = 'big'>رقم الشكاوي:</font>"
+                        +"[C]\n";
+        printer.printFormattedText(resetText);
+    }
+
+    private String getOrdersPrintText(List<OrderProduct> list) {
+        String ordersPrint = "";
+        for (OrderProduct order : list ){
+            String productName = order.getProductName();
+            String originalPrice = order.getOriginalPrice();
+            String finalPrice  = order.getFinalPrice();
+            float orderedAmount = order.getOrdered();
+            String total = String.valueOf(orderedAmount * Float.parseFloat(finalPrice));
+            ordersPrint +=
+                    "[L]"+ total+"   [L]"+orderedAmount +"   [L]"+finalPrice+"   [L]"+originalPrice+"   [R]"+productName;
+        }
+        return ordersPrint;
     }
 }

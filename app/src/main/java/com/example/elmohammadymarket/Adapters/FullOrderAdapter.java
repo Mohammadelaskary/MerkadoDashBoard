@@ -41,6 +41,7 @@ import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 import com.example.elmohammadymarket.Model.FullOrder;
 import com.example.elmohammadymarket.Model.OrderProduct;
 import com.example.elmohammadymarket.OnCallClickListener;
+import com.example.elmohammadymarket.OnPrintClickListener;
 import com.example.elmohammadymarket.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,20 +59,22 @@ import java.util.Map;
 
 import static androidx.core.content.ContextCompat.*;
 
-public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.FullOrderViewHolder> {
+public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.FullOrderViewHolder>  {
     private static final int PRINT_REQUEST_CODE = 300;
     Context context;
     List<FullOrder> ordersList;
     boolean newOrder;
     private OnCallClickListener onCallClickListener;
+    private OnPrintClickListener onPrintClickListener;
 
     String id;
 
-    public FullOrderAdapter(Context context,List<FullOrder> ordersList, boolean newOrder, OnCallClickListener onCallClickListener) {
+    public FullOrderAdapter(Context context,List<FullOrder> ordersList, boolean newOrder, OnCallClickListener onCallClickListener,OnPrintClickListener onPrintClickListener) {
         this.context = context;
         this.newOrder = newOrder;
         this.ordersList = ordersList;
         this.onCallClickListener = onCallClickListener;
+        this.onPrintClickListener = onPrintClickListener;
     }
 
 
@@ -186,18 +189,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                                 updateOrder(shiped);
                             } break;
                             case R.id.print:{
-                                if (checkSelfPermission(context, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-                                    ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.BLUETOOTH},PRINT_REQUEST_CODE);
-                                } else {
-                                    try {
-                                        printOrder(ordersList.get(position));
-                                    } catch (EscPosConnectionException | EscPosParserException | EscPosEncodingException | EscPosBarcodeException e) {
-                                        e.printStackTrace();
-                                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        Log.d("printerError",e.getMessage());
-                                    }
-                                }
-
+                               onPrintClickListener.onPrintClickListener(ordersList.get(position));
                             } break;
                             case R.id.delete_order:{
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
@@ -234,89 +226,9 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         }
 
 
-        holder.deleteOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-
-            }
-        });
     }
 
-    private void printOrder(FullOrder fullOrder) throws EscPosConnectionException, EscPosParserException, EscPosEncodingException, EscPosBarcodeException {
-        final String customerName = fullOrder.getUsername();
-        final String address = fullOrder.getAddress();
-        final String mobileNumber = fullOrder.getMobilePhone();
-        final float sum = fullOrder.getSum();
-        final float discount = fullOrder.getDiscount();
-        final float overAllDiscount = fullOrder.getOverAllDiscount();
-        final String phoneNumber = fullOrder.getPhoneNumber();
-        final float netCost = fullOrder.getTotalCost();
-        final List<OrderProduct> list = fullOrder.getOrders();
-        final float shipping = fullOrder.getShipping();
-        String ordersPrint = getOrdersPrintText(list);
-        String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
-
-        EscPosPrinter printer = new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(), 203, 80f, 32);
-        String resetText =
-                "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, context.getApplicationContext().getResources().getDrawableForDensity(R.drawable.ic_mercado_logo_small, DisplayMetrics.DENSITY_MEDIUM))+"</img>\n"
-                +"[C]\n"
-                +"[C]<u><font size ='big'>ميركادو</font></u>"
-                +"[C]\n"
-                +"[C]_________________________"
-                +"[C]\n"
-                +"[R]"+timeStamp+"[R]<font size = 'big'>الوقت والتاريخ:</font>"
-                +"[C]\n"
-                +"[R]"+customerName+"[R]<font size = 'big'>اسم العميل:</font>"
-                +"[C]\n"
-                +"[R]"+mobileNumber+"[R]<font size = 'big'>رقم التليفون المحمول:</font>"
-                +"[C]\n"
-                +"[R]"+phoneNumber+"[R]<font size = 'big'>رقم التليفون الأرضي:</font>"
-                +"[C]\n"
-                +"[R]"+address+"[R]<font size = 'big'>العنوان:</font>"
-                +"[C]\n"
-                +"[C]_________________________"
-                +"[C]\n"
-                +"[L]الاجمالي[L]الكمية   [L]بعد الخصم   [L]قبل الخصم   [R]اسم الصنف"
-                +"[C]\n"
-                +"[C]_________________________"
-                +"[C]\n"
-                +ordersPrint
-                +"[C]\n"
-                +"[C]_________________________"
-                +"[C]\n"
-                +"[L]"+sum+"[R]<font size = 'big'>الإجمالي:</font>"
-                +"[C]\n"
-                +"[L]"+discount+"[R]<font size = 'big'>إجمالي الخصم:</font>"
-                +"[C]\n"
-                +"[L]"+overAllDiscount+"[R]<font size = 'big'>الخصم علي المجموع:</font>"
-                +"[C]\n"
-                +"[L]"+shipping+"[R]<font size = 'big'>مصاريف الشحن:</font>"
-                +"[C]\n"
-                +"[C]_________________________"
-                +"[C]\n"
-                +"[L]"+netCost+"[R]<font size = 'big'>المبلغ المطلوب:</font>"
-                +"[C]\n"
-                +"[C]========================="
-                +"[C]\n"
-                +"[C]01101515954[C]<font size = 'big'>رقم الشكاوي:</font>"
-                +"[C]\n";
-            printer.printFormattedText(resetText);
-    }
-
-    private String getOrdersPrintText(List<OrderProduct> list) {
-        String ordersPrint = "";
-        for (OrderProduct order : list ){
-            String productName = order.getProductName();
-            String originalPrice = order.getOriginalPrice();
-            String finalPrice  = order.getFinalPrice();
-            float orderedAmount = order.getOrdered();
-            String total = String.valueOf(orderedAmount * Float.parseFloat(finalPrice));
-            ordersPrint +=
-                    "[L]"+ total+"   [L]"+orderedAmount +"   [L]"+finalPrice+"   [L]"+originalPrice+"   [R]"+productName;
-        }
-        return ordersPrint;
-    }
 
     private void markAsSeen() {
         final Map<String, Object> map = new HashMap<>();
@@ -358,6 +270,8 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
     public int getItemCount() {
         return ordersList.size();
     }
+
+
 
     static class FullOrderViewHolder extends RecyclerView.ViewHolder {
         TextView time, mobileNumber, date, customerName, address, phoneNumber, totalCost, sumText, discountText, overallDiscount, shipping;

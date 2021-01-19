@@ -1,31 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layoutDirection="rtl"
-    tools:context=".Views.ChangeShipping">
+    android:layoutDirection="rtl">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_10sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:paddingStart="@dimen/_10sdp"
-        android:paddingEnd="@dimen/_10sdp"
-        android:background="@drawable/button_background">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/neighborhood_name"
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_5sdp"
-            android:layout_weight="8"
+            android:text="إضافة محافظة"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/title_background"
+            android:paddingTop="@dimen/_1sdp"
+            android:paddingBottom="@dimen/_1sdp"
+            android:paddingEnd="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:paddingStart="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_3sdp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/governorate_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="start"
+            android:layout_margin="@dimen/_10sdp"
             app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -34,48 +40,242 @@
                 android:background="@drawable/empty_edit_text"
                 android:enabled="true"
                 android:gravity="center_vertical"
-                android:hint="اسم الحي"
+                android:hint="اسم المحافظة"
                 android:inputType="text" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
-        <ImageButton
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/add_governorate_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_my_location"
-            android:background="@android:color/transparent"
-            android:layout_gravity="center"
-            android:id="@+id/myLocation" />
-    </LinearLayout>
+            style="?android:progressBarStyleSmall"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:visibility="gone"
 
+            />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/add_governorate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:background="@drawable/add_button_background"
+        android:padding="@dimen/_5sdp"
+        android:text="إضافة"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_15ssp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:layout_margin="@dimen/_10sdp"
+        android:background="#777777"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="إضافة مدينة"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/title_background"
+        android:paddingTop="@dimen/_1sdp"
+        android:paddingBottom="@dimen/_1sdp"
+        android:paddingStart="@dimen/_20sdp"
+        android:paddingEnd="@dimen/_20sdp"
+        android:layout_marginTop="@dimen/_3sdp"
+        android:layout_marginBottom="@dimen/_3sdp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="اختر المحافظة"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_3sdp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <Spinner
+        android:id="@+id/governorate_name_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_centerInParent="true"
+        />
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/governorate_names_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:progressBarStyleSmall"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:visibility="gone"
+
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/city_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_margin="@dimen/_10sdp"
+        app:errorEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/empty_edit_text"
+            android:enabled="true"
+            android:gravity="center_vertical"
+            android:hint="اسم المدينة"
+            android:inputType="text" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/add_city_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:progressBarStyleSmall"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:visibility="gone"
+
+            />
+    </RelativeLayout>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/_5sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:text="إضافة"
+        android:textSize="@dimen/_15ssp"
+        android:background="@drawable/add_button_background"
+        android:id="@+id/add_city"
+        android:textColor="@android:color/white" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
         android:layout_margin="@dimen/_10sdp"
+        android:background="#777777"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="إضافة حي"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/title_background"
+        android:paddingTop="@dimen/_1sdp"
+        android:paddingBottom="@dimen/_1sdp"
+        android:paddingStart="@dimen/_20sdp"
+        android:paddingEnd="@dimen/_20sdp"
+        android:layout_marginTop="@dimen/_3sdp"
+        android:layout_marginBottom="@dimen/_3sdp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="اختر المحافظة"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_3sdp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <Spinner
+        android:id="@+id/governorate_name_spinner2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        />
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/governorate_names_progress1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:progressBarStyleSmall"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:visibility="gone"
+            />
+    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="اختر المدينة"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_3sdp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <Spinner
+        android:id="@+id/city_name_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        />
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/get_cities_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:progressBarStyleSmall"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_centerVertical="true"
+            android:visibility="gone"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/neighborhood_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_margin="@dimen/_10sdp"
+        app:errorEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/empty_edit_text"
+            android:enabled="true"
+            android:gravity="center_vertical"
+            android:hint="اسم الحي"
+            android:inputType="text" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/add_neighborhood_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:progressBarStyleSmall"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:visibility="gone"
+
+            />
+    </RelativeLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_5sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:text="إضافة"
         android:textSize="@dimen/_15ssp"
         android:background="@drawable/add_button_background"
         android:id="@+id/add_neighborhood"
         android:textColor="@android:color/white" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="الأحياء الحالية"
-        android:layout_gravity="center" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/neighborhood_list"
-        android:visibility="gone" />
-
-    <androidx.core.widget.ContentLoadingProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/loading_shipping_fee"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/_10sdp"
-        style="?android:progressBarStyleLarge" />
 </LinearLayout>
+</ScrollView>

@@ -1,6 +1,10 @@
 package com.example.elmohammadymarket.Views;
 
 import android.Manifest;
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,20 +19,36 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dantsu.escposprinter.EscPosCharsetEncoding;
+import com.dantsu.escposprinter.EscPosPrinter;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
+import com.dantsu.escposprinter.exceptions.EscPosBarcodeException;
+import com.dantsu.escposprinter.exceptions.EscPosConnectionException;
+import com.dantsu.escposprinter.exceptions.EscPosEncodingException;
+import com.dantsu.escposprinter.exceptions.EscPosParserException;
+import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 import com.example.elmohammadymarket.Adapters.FullOrderAdapter;
 import com.example.elmohammadymarket.Model.FullOrder;
+import com.example.elmohammadymarket.Model.OrderProduct;
 import com.example.elmohammadymarket.OnCallClickListener;
+import com.example.elmohammadymarket.OnPrintClickListener;
+import com.example.elmohammadymarket.R;
 import com.example.elmohammadymarket.databinding.ActivityOrdersBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,20 +59,47 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
+import static androidx.core.content.ContextCompat.checkSelfPermission;
 
-public class OrdersActivity extends AppCompatActivity implements OnCallClickListener {
+public class OrdersActivity extends AppCompatActivity implements OnCallClickListener, OnPrintClickListener {
     private static final int REQUEST_CODE_CALL = 100;
     private static final int REQUEST_CODE_SHARE = 200;
+    private static final int PRINT_REQUEST_CODE = 300;
     ActivityOrdersBinding binding;
     List<FullOrder> list = new ArrayList<>();
     FullOrderAdapter adapter;
     String mobileNumber;
     LinearLayout layout;
     String mobileNumberGlobal;
+    FullOrder order;
+
+    BluetoothAdapter mBluetoothAdapter;
+    BluetoothSocket mmSocket;
+    BluetoothDevice mmDevice;
+
+    // needed for communication to bluetooth device / network
+    OutputStream mmOutputStream;
+    InputStream mmInputStream;
+    Thread workerThread;
+
+    byte[] readBuffer;
+    int readBufferPosition;
+    volatile boolean stopWorker;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +111,15 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         binding.fullOrderRecycler.setVisibility(View.GONE);
         binding.ordersTitle.setVisibility(View.GONE);
         binding.progressBar.setVisibility(View.VISIBLE);
-
+        findBT();
+        try {
+            openBT();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (isConnected()) {
             getData();
-            adapter = new FullOrderAdapter(this, list, true, this);
+            adapter = new FullOrderAdapter(this, list, true, this,this);
             binding.fullOrderRecycler.setAdapter(adapter);
             binding.fullOrderRecycler.setItemAnimator(new DefaultItemAnimator());
             binding.fullOrderRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, true));
@@ -125,7 +177,129 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         }
         return connected;
     }
+    void findBT() {
 
+        try {
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+            if(mBluetoothAdapter == null) {
+                Toast.makeText(this, "No bluetooth adapter available", Toast.LENGTH_SHORT).show();
+            }
+
+            if(!mBluetoothAdapter.isEnabled()) {
+                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBluetooth, 0);
+            }
+
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+            if(pairedDevices.size() > 0) {
+                for (BluetoothDevice device : pairedDevices) {
+
+                    // RPP300 is the name of the bluetooth printer device
+                    // we got this name from the list of paired devices
+                    if (device.getName().equals("XP-P323B-94EE")) {
+                        mmDevice = device;
+                        break;
+                    }
+                }
+            }
+
+            Toast.makeText(this, "Bluetooth device found.", Toast.LENGTH_SHORT).show();
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    void openBT() throws IOException {
+        try {
+
+            // Standard SerialPortService ID
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+            mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
+            mmSocket.connect();
+            mmOutputStream = mmSocket.getOutputStream();
+            mmInputStream = mmSocket.getInputStream();
+
+            beginListenForData();
+
+            Toast.makeText(this, "Bluetooth Opened", Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void beginListenForData() {
+        try {
+            final Handler handler = new Handler();
+
+            // this is the ASCII code for a newline character
+            final byte delimiter = 10;
+
+            stopWorker = false;
+            readBufferPosition = 0;
+            readBuffer = new byte[1024];
+
+            workerThread = new Thread(new Runnable() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                public void run() {
+
+                    while (!Thread.currentThread().isInterrupted() && !stopWorker) {
+
+                        try {
+
+                            int bytesAvailable = mmInputStream.available();
+
+                            if (bytesAvailable > 0) {
+
+                                byte[] packetBytes = new byte[bytesAvailable];
+                                mmInputStream.read(packetBytes);
+
+                                for (int i = 0; i < bytesAvailable; i++) {
+
+                                    byte b = packetBytes[i];
+                                    if (b == delimiter) {
+
+                                        byte[] encodedBytes = new byte[readBufferPosition];
+                                        System.arraycopy(
+                                                readBuffer, 0,
+                                                encodedBytes, 0,
+                                                encodedBytes.length
+                                        );
+
+                                        // specify US-ASCII encoding
+                                        final String data = new String(encodedBytes, "ISO/IEC 8859-6");
+                                        readBufferPosition = 0;
+
+                                        // tell the user data were sent to bluetooth printer device
+                                        handler.post(new Runnable() {
+                                            public void run() {
+                                                Toast.makeText(OrdersActivity.this, data, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    } else {
+                                        readBuffer[readBufferPosition++] = b;
+                                    }
+                                }
+                            }
+
+                        } catch (IOException ex) {
+                            stopWorker = true;
+                        }
+
+                    }
+                }
+            });
+
+            workerThread.start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void onCallClickListener(String mobileNumber) {
         this.mobileNumber = mobileNumber;
@@ -261,7 +435,131 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                 shareData(layout,mobileNumber);
             }
         }
+        if (requestCode == PRINT_REQUEST_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+                    printOrder(order);
+
+            }
+        }
+
+    }
+
+    @Override
+    public void onPrintClickListener(FullOrder order) {
+        this.order = order;
+        Log.d("blue","print interface");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.d("blue","permissiongranted");
+
+                    printOrder(order);
+
+            } else {
+                ActivityCompat.requestPermissions(OrdersActivity.this, new String[]{Manifest.permission.BLUETOOTH}, PRINT_REQUEST_CODE);
+                Log.d("bluetoothPermissionNot","permission not granted");
+            }
+        }
+    }
+    private void printOrder(FullOrder fullOrder) {
+        final String customerName = fullOrder.getUsername();
+        final String address = fullOrder.getAddress();
+        final String mobileNumber = fullOrder.getMobilePhone();
+        final float sum = fullOrder.getSum();
+        final float discount = fullOrder.getDiscount();
+        final float overAllDiscount = fullOrder.getOverAllDiscount();
+        final String phoneNumber = fullOrder.getPhoneNumber();
+        final float netCost = fullOrder.getTotalCost();
+        final List<OrderProduct> list = fullOrder.getOrders();
+        final float shipping = fullOrder.getShipping();
+        String ordersPrint = getOrdersPrintText(list);
+        String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
+        Log.d("blue","print method");
+////        System.setProperty("file.encoding", "UTF-16");
+//        EscPosPrinter printer =
+//                new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(),
+//                        203,
+//                        576f,
+//                        100);
+////        Log.d("blue",printer.getPrinterDpi()+"");
+//        String resetText =
+//////                "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, this.getApplicationContext().getResources().getDrawableForDensity(R.drawable.ic_mercado_logo_small, DisplayMetrics.DENSITY_MEDIUM))+"</img>\n";
+//
+//                        "ميركادو[C]"
+//                       ;
+////                        +"[C]_________________________"
+////                        +"[C]\n"
+////                        +"[R]"+timeStamp+"[R]<font size = 'big'>الوقت والتاريخ:</font>"
+////                        +"[C]\n"
+////                        +"[R]"+customerName+"[R]<font size = 'big'>اسم العميل:</font>"
+////                        +"[C]\n"
+////                        +"[R]"+mobileNumber+"[R]<font size = 'big'>رقم التليفون المحمول:</font>"
+////                        +"[C]\n"
+////                        +"[R]"+phoneNumber+"[R]<font size = 'big'>رقم التليفون الأرضي:</font>"
+////                        +"[C]\n"
+////                        +"[R]"+address+"[R]<font size = 'big'>العنوان:</font>"
+////                        +"[C]\n"
+////                        +"[C]_________________________"
+////                        +"[C]\n"
+////                        +"[L]الاجمالي[L]الكمية   [L]بعد الخصم   [L]قبل الخصم   [R]اسم الصنف"
+////                        +"[C]\n"
+////                        +"[C]_________________________"
+////                        +"[C]\n"
+////                        +ordersPrint
+////                        +"[C]\n"
+////                        +"[C]_________________________"
+////                        +"[C]\n"
+////                        +"[L]"+sum+"[R]<font size = 'big'>الإجمالي:</font>"
+////                        +"[C]\n"
+////                        +"[L]"+discount+"[R]<font size = 'big'>إجمالي الخصم:</font>"
+////                        +"[C]\n"
+////                        +"[L]"+overAllDiscount+"[R]<font size = 'big'>الخصم علي المجموع:</font>"
+////                        +"[C]\n"
+////                        +"[L]"+shipping+"[R]<font size = 'big'>مصاريف الشحن:</font>"
+////                        +"[C]\n"
+////                        +"[C]_________________________"
+////                        +"[C]\n"
+////                        +"[L]"+netCost+"[R]<font size = 'big'>المبلغ المطلوب:</font>"
+////                        +"[C]\n"
+////                        +"[C]========================="
+////                        +"[C]\n"
+////                        +"[C]01101515954[C]<font size = 'big'>رقم الشكاوي:</font>"
+////                        +"[C]\n";
+//
+    //    printer.printFormattedTextAndCut(resetText);
+        try {
+
+            // the text typed by the user
+            String msg = "الله اكبر";
+            msg += "\n";
+            msg += "\n";
+            msg += "\n";
+            msg += "\n";
+
+            mmOutputStream.write(msg.getBytes());
+
+            // tell the user data were sent
+            Toast.makeText(this, "تم ارسال البيانات", Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getOrdersPrintText(List<OrderProduct> list) {
+        String ordersPrint = "";
+        for (OrderProduct order : list ){
+            String productName = order.getProductName();
+            String originalPrice = order.getOriginalPrice();
+            String finalPrice  = order.getFinalPrice();
+            float orderedAmount = order.getOrdered();
+            String total = String.valueOf(orderedAmount * Float.parseFloat(finalPrice));
+            ordersPrint +=
+                    "[L]"+ total+"   [L]"+orderedAmount +"   [L]"+finalPrice+"   [L]"+originalPrice+"   [R]"+productName;
+        }
+        return ordersPrint;
     }
 
 }
