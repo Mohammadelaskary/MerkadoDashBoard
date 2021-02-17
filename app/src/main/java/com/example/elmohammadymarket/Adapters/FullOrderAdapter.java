@@ -189,7 +189,11 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                                 updateOrder(shiped);
                             } break;
                             case R.id.print:{
-                               onPrintClickListener.onPrintClickListener(ordersList.get(position));
+                                try {
+                                    onPrintClickListener.onPrintClickListener(ordersList.get(position));
+                                } catch (EscPosConnectionException | EscPosEncodingException | EscPosBarcodeException | EscPosParserException e) {
+                                    e.printStackTrace();
+                                }
                             } break;
                             case R.id.delete_order:{
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference();

@@ -24,6 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
+
         <provider
             android:name=".GenericFileProvider"
             android:authorities="${applicationId}.provider"
@@ -31,9 +32,10 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
-        <activity android:name=".Views.PreOrdersActivity"></activity>
+
+        <activity android:name=".Views.PreOrdersActivity" />
         <activity android:name=".Views.ContactActivity" />
         <activity android:name=".Views.UsersData" />
         <activity android:name=".Views.ComplaintsActivity" />
@@ -56,15 +58,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".Views.LoginActivity" />
-        <activity android:name=".Views.OrdersActivity" >
-
-        </activity>
+        <activity android:name=".Views.OrdersActivity"></activity>
         <activity android:name=".Views.ManageProducts" />
         <activity android:name=".Views.AddNewAd" />
         <activity android:name=".Views.AddNewProduct" />
-        <activity android:name=".Views.MainActivity" >
-
-        </activity>
+        <activity android:name=".Views.MainActivity"></activity>
 
         <service
             android:name=".NotificationPackage.MyFirebaseMessagingService"
@@ -76,6 +74,8 @@
         <service
             android:name=".NotificationPackage.OrdersNotificationsService"
             android:exported="false" />
+        <service android:name="net.posprinter.service.PosprinterService" />
+
     </application>
 
 </manifest>

@@ -1,19 +1,24 @@
 package com.example.elmohammadymarket.Views;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.elmohammadymarket.Adapters.SubDepAdapter;
@@ -21,6 +26,7 @@ import com.example.elmohammadymarket.Database.DepartmentNames;
 import com.example.elmohammadymarket.Model.SubDeparment;
 import com.example.elmohammadymarket.R;
 import com.example.elmohammadymarket.databinding.ActivityAddSubDepartmentBinding;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -29,23 +35,34 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AddSubDepartment extends AppCompatActivity {
+    private static final int IMAGE_REQUEST = 100;
     ActivityAddSubDepartmentBinding binding;
     SubDepAdapter adapter;
     List<DepartmentNames> depsNames;
     List<SubDeparment> list;
     ProgressDialog progressDialog;
+    Uri imageUri;
+    String imageFileName,imageUrl;
+    StorageReference storage;
+    private StorageTask<UploadTask.TaskSnapshot> uploadTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityAddSubDepartmentBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        storage = FirebaseStorage.getInstance().getReference("Images");
         binding.subdepName.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -69,6 +86,13 @@ public class AddSubDepartment extends AppCompatActivity {
                     binding.subdepName.setError(null);
             }
         });
+
+        binding.addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openImage();
+            }
+        });
         list = new ArrayList<>();
         depsNames = new ArrayList<>();
         adapter = new SubDepAdapter(AddSubDepartment.this, list);
@@ -77,7 +101,7 @@ public class AddSubDepartment extends AppCompatActivity {
         new GetDepsAndProducts().execute();
         adapter = new SubDepAdapter(AddSubDepartment.this, list);
         binding.subdeps.setAdapter(adapter);
-        binding.subdeps.setLayoutManager(new LinearLayoutManager(AddSubDepartment.this));
+        binding.subdeps.setLayoutManager(new GridLayoutManager(AddSubDepartment.this,2));
         binding.depName.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
                     @Override
@@ -115,26 +139,101 @@ public class AddSubDepartment extends AppCompatActivity {
                 }
                 if (subList.contains(subDep))
                     binding.subdepName.setError("اسم القسم الداخلي مستخدم من قبل");
-                if (!depName.isEmpty() && !subDep.isEmpty() && !subList.contains(subDep)) {
+
+                if (imageUri==null)
+                    FancyToast.makeText(getApplicationContext(), "من فضلك اختر صورة للقسم الداخلي", FancyToast.LENGTH_SHORT, FancyToast.WARNING, false).show();
+
+                if (!depName.isEmpty() && !subDep.isEmpty() && !subList.contains(subDep)&&imageUri!= null) {
                     progressDialog = new ProgressDialog(AddSubDepartment.this);
                     progressDialog.setMessage("Loading....");
                     progressDialog.show();
                     progressDialog.setCancelable(false);
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("SubDeps");
-                    final SubDeparment subDeparment = new SubDeparment(depName, subDep);
-                    reference.push().setValue(subDeparment).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            progressDialog.hide();
-                            FancyToast.makeText(getApplicationContext(), "تم إضافة القسم الفرعي", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
-                        }
-                    });
+
+                    uploadImage(imageUri);
+
+
                 }
 
             }
         });
 
     }
+
+    private void uploadImage(Uri imageUri) {
+        imageFileName = System.currentTimeMillis() + "." + getFileExtension(imageUri);
+        final StorageReference fileReference = storage.child(imageFileName);
+        uploadTask = fileReference.putFile(imageUri);
+        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw Objects.requireNonNull(task.getException());
+                }
+                return fileReference.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    assert downloadUri != null;
+                    assert imageFileName != null;
+                    imageUrl = downloadUri.toString();
+                    String depName = binding.depName.getSelectedItem().toString();
+                    String subDep  = binding.subdepName.getEditText().getText().toString().trim();
+                    String disCountString = binding.discount.getEditText().getText().toString().trim();
+                    String discount_unit;
+                    int discount;
+                    if (disCountString.isEmpty()) {
+                        discount = 0;
+                        discount_unit = "";
+                    } else {
+                        discount_unit = binding.discountUnit.getSelectedItem().toString();
+                        discount = Integer.parseInt(disCountString);
+                    }
+                    final SubDeparment subDeparment = new SubDeparment(depName, subDep,imageFileName,imageUrl,discount_unit,discount);
+                    uploadSubDep(subDeparment);
+                } else {
+                    FancyToast.makeText(getApplicationContext(), "حدث خطأ ما !", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
+                }
+                progressDialog.dismiss();
+            }
+        });
+    }
+    private String getFileExtension(Uri imageUri) {
+        ContentResolver contentResolver = Objects.requireNonNull(getApplicationContext()).getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(imageUri));
+    }
+
+    private void uploadSubDep(SubDeparment subDeparment) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("SubDeps");
+        reference.push().setValue(subDeparment).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                FancyToast.makeText(getApplicationContext(), "تم إضافة القسم الفرعي", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
+            }
+        });
+    }
+
+    private  void openImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            binding.addImage.setImageURI(imageUri);
+        }
+    }
+
 
     public class GetDepsAndProducts extends AsyncTask<Void, Void, Void> {
         @Override

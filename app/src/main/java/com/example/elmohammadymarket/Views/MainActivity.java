@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
+    public static final int PERMISSION_BLUETOOTH = 100;
     ActivityMainBinding binding;
     private FirebaseAuth mAuth;
     public static MyDatabase db;
