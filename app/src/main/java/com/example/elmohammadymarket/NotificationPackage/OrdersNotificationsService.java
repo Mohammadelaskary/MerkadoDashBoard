@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -13,6 +14,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.elmohammadymarket.Model.CanceledOrder;
 import com.example.elmohammadymarket.R;
 import com.example.elmohammadymarket.Views.ComplaintsActivity;
 import com.example.elmohammadymarket.Views.MainActivity;
@@ -99,6 +101,46 @@ public class OrdersNotificationsService extends Service {
                         .setSmallIcon(R.drawable.ic_baseline_notifications_24)
                         .build();
                 finalManager1.notify(4, notification);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference("CanceledOrder");
+        final NotificationManagerCompat finalManager2 = manager;
+        ref2.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                CanceledOrder canceledOrder = dataSnapshot.getValue(CanceledOrder.class);
+                Intent intent1 = new Intent(OrdersNotificationsService.this, OrdersActivity.class);
+                intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(OrdersNotificationsService.this, 0, intent1, PendingIntent.FLAG_ONE_SHOT);
+                Notification notification = new NotificationCompat.Builder(OrdersNotificationsService.this, CHANNEL_ID)
+                        .setContentTitle("طلب ملغي")
+                        .setContentText("العميل "+canceledOrder.getCustomerName()+" ألغي الطلب!!")
+                        .setContentIntent(pendingIntent)
+                        .setSmallIcon(R.drawable.ic_warning)
+                        .setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.order_canceled))
+                        .build();
+                finalManager2.notify(3, notification);
             }
 
             @Override

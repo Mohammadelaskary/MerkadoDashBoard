@@ -28,7 +28,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/print_margin"
-        android:layout_marginEnd="@dimen/print_margin">
+        android:layout_marginEnd="@dimen/print_margin"
+        android:layoutDirection="rtl">
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -134,7 +134,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
             }
         });
 
-        markAsSeen();
+        markAsSeen(id);
 
         if (isDone) {
             holder.done.setChecked(true);
@@ -186,7 +186,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                                 onCallClickListener.onSendClickListener(holder.orderLayout,  mobileNumber);
                                 Map<String, Object> shiped = new HashMap<>();
                                 shiped.put("shiped", true);
-                                updateOrder(shiped);
+                                updateOrder(shiped,id);
                             } break;
                             case R.id.print:{
                                 try {
@@ -234,7 +234,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
     }
 
 
-    private void markAsSeen() {
+    private void markAsSeen(String id) {
         final Map<String, Object> map = new HashMap<>();
         map.put("seen", true);
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Orders");
@@ -253,9 +253,9 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         });
     }
 
-    private void updateOrder(final Map<String, Object> map) {
+    private void updateOrder(final Map<String, Object> map,String id) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Orders");
-        Query query = reference.orderByKey().equalTo(id);
+        Query query = reference.orderByChild("id").equalTo(id);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
