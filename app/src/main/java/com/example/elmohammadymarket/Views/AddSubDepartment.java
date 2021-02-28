@@ -97,7 +97,7 @@ public class AddSubDepartment extends AppCompatActivity {
         depsNames = new ArrayList<>();
         adapter = new SubDepAdapter(AddSubDepartment.this, list);
         binding.subdeps.setAdapter(adapter);
-        binding.subdeps.setLayoutManager(new LinearLayoutManager(this));
+        binding.subdeps.setLayoutManager(new GridLayoutManager(this,2));
         new GetDepsAndProducts().execute();
         adapter = new SubDepAdapter(AddSubDepartment.this, list);
         binding.subdeps.setAdapter(adapter);
@@ -107,7 +107,6 @@ public class AddSubDepartment extends AppCompatActivity {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                         String depName = binding.depName.getSelectedItem().toString();
-                        binding.depNameText.setText(depName);
                         new GetAllsubDeps().execute(depName);
 
                     }
@@ -115,7 +114,6 @@ public class AddSubDepartment extends AppCompatActivity {
                     @Override
                     public void onNothingSelected(AdapterView<?> adapterView) {
                         String depName = binding.depName.getSelectedItem().toString();
-                        binding.depNameText.setText(depName);
                         new GetAllsubDeps().execute(depName);
 
                     }
@@ -181,17 +179,8 @@ public class AddSubDepartment extends AppCompatActivity {
                     imageUrl = downloadUri.toString();
                     String depName = binding.depName.getSelectedItem().toString();
                     String subDep  = binding.subdepName.getEditText().getText().toString().trim();
-                    String disCountString = binding.discount.getEditText().getText().toString().trim();
-                    String discount_unit;
-                    int discount;
-                    if (disCountString.isEmpty()) {
-                        discount = 0;
-                        discount_unit = "";
-                    } else {
-                        discount_unit = binding.discountUnit.getSelectedItem().toString();
-                        discount = Integer.parseInt(disCountString);
-                    }
-                    final SubDeparment subDeparment = new SubDeparment(depName, subDep,imageFileName,imageUrl,discount_unit,discount);
+
+                    final SubDeparment subDeparment = new SubDeparment(depName, subDep,imageFileName,imageUrl);
                     uploadSubDep(subDeparment);
                 } else {
                     FancyToast.makeText(getApplicationContext(), "حدث خطأ ما !", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();

@@ -4,6 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="print_font_size">3mm</dimen>
     <dimen name="print_margin">.5mm</dimen>
-    <dimen name="print_width">72mm</dimen>
+    <dimen name="print_width">78mm</dimen>
     <dimen name="image_width">60mm</dimen>
 </resources>

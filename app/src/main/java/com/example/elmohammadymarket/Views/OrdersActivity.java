@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -31,11 +32,14 @@ import android.printservice.PrintService;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -683,11 +687,14 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                         == PackageManager.PERMISSION_GRANTED) {
                     Log.d("blue", "permissiongranted");
 
-                    try {
-                        printOrder(order);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                        try {
+                            printOrder(order);
+                        } catch (Exception e){
+
+                        }
+
+
+
 
                 } else {
                     ActivityCompat.requestPermissions(OrdersActivity.this, new String[]{Manifest.permission.BLUETOOTH}, PRINT_REQUEST_CODE);
@@ -702,22 +709,36 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             Bitmap receipt = createClusterBitmap(fullOrder);
 
             printImage(receipt);
-            final String customerName = fullOrder.getUsername();
-            final String address = fullOrder.getAddress();
-            final String mobileNumber = fullOrder.getMobilePhone();
-            final float sum = fullOrder.getSum();
-            final float discount = fullOrder.getDiscount();
-            final float overAllDiscount = fullOrder.getOverAllDiscount();
-            final String phoneNumber = fullOrder.getPhoneNumber();
-            final float netCost = fullOrder.getTotalCost();
-            final List<OrderProduct> list = fullOrder.getOrders();
-            final float shipping = fullOrder.getShipping();
-            String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
-
-            ReceiptBuilder receiptBuilder = new ReceiptBuilder(1000);
-
-            receiptBuilder.setMargin(0,0).
-                   addImage(receipt);
+//            Toast.makeText(this, "printed", Toast.LENGTH_SHORT).show();
+//            AlertDialog.Builder alertadd = new AlertDialog.Builder(this);
+//            LayoutInflater factory = LayoutInflater.from(this);
+//            final View view = factory.inflate(R.layout.dialog_image, null);
+//            ImageView receiptShow = view.findViewById(R.id.receipt);
+//            receiptShow.setImageBitmap(receipt);
+//            alertadd.setView(view);
+//            alertadd.setNeutralButton("Here!", new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dlg, int sumthin) {
+//
+//                }
+//            });
+//
+//            alertadd.show();
+//            final String customerName = fullOrder.getUsername();
+//            final String address = fullOrder.getAddress();
+//            final String mobileNumber = fullOrder.getMobilePhone();
+//            final float sum = fullOrder.getSum();
+//            final float discount = fullOrder.getDiscount();
+//            final float overAllDiscount = fullOrder.getOverAllDiscount();
+//            final String phoneNumber = fullOrder.getPhoneNumber();
+//            final float netCost = fullOrder.getTotalCost();
+//            final List<OrderProduct> list = fullOrder.getOrders();
+//            final float shipping = fullOrder.getShipping();
+//            String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
+//
+//            ReceiptBuilder receiptBuilder = new ReceiptBuilder(1000);
+//
+//            receiptBuilder.setMargin(0,0).
+//                   addImage(receipt);
 
 
     //        shareReceipt(receipt);
@@ -774,7 +795,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         binder.writeDataByYouself(new UiExecute() {
             @Override
             public void onsucess() {
-
+                Toast.makeText(OrdersActivity.this, "printed", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -899,7 +920,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             TextView totalPrint = cluster.findViewById(R.id.total_print);
             TextView comlaints_phone = cluster.findViewById(R.id.complaints_phone);
             RecyclerView orders = cluster.findViewById(R.id.order_products);
-            attachRecyclerViewToAdapter(list, orders);
+            attachRecyclerViewToAdapter(list,orders);
 
 
             dateTimePrint.setText(timeStamp);
@@ -934,6 +955,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         private void attachRecyclerViewToAdapter(List<OrderProduct> list, RecyclerView orders) {
             printAdapter = new PrintOrderAdapter(list);
             orders.setAdapter(printAdapter);
+
         }
 
         void connectBluetooth(){

@@ -621,7 +621,7 @@ public class AddNewProduct extends AppCompatActivity {
         unitWeight = bundle.getString("unitWeight");
         discount = bundle.getString("discount");
         discountUnit = bundle.getString("discountUnit");
-        availableAmount = bundle.getInt("availableAmount");
+        availableAmount = bundle.getFloat("availableAmount");
         count = bundle.getString("count");
         todaysOffer = bundle.getBoolean("todaysOffer");
         mostSold = bundle.getBoolean("mostSold");

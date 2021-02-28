@@ -52,40 +52,7 @@
                 android:background="@drawable/empty_edit_text"
                 android:padding="@dimen/_5sdp" />
         </com.google.android.material.textfield.TextInputLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_marginEnd="@dimen/_10sdp"
-                android:id="@+id/discount"
-                android:gravity="start"
-                android:background="@drawable/button_background"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:layout_marginBottom="@dimen/_5sdp"
-                android:paddingStart="@dimen/_10sdp"
-                android:paddingEnd="@dimen/_10sdp"
-                app:errorEnabled="true">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="الخصم"
-                    android:inputType="numberDecimal"
-                    android:background="@drawable/empty_edit_text"
-                    android:padding="@dimen/_5sdp" />
-            </com.google.android.material.textfield.TextInputLayout>
-        <Spinner
-            android:id="@+id/discount_unit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/_15sdp"
-            android:entries="@array/discount_options"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"/>
-        </RelativeLayout>
         <ImageView
             android:layout_width="@dimen/_120sdp"
             android:layout_height="@dimen/_120sdp"
@@ -107,20 +74,7 @@
             android:textSize="@dimen/_15ssp"
             android:id="@+id/add" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/add"
-            android:layout_margin="@dimen/_5sdp"
-            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/dep_name_text"
-                android:textSize="@dimen/_20ssp"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_marginEnd="@dimen/_10sdp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -130,17 +84,16 @@
                 android:visibility="gone"
                 android:id="@+id/no_subdeps_found" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/_5sdp"
-                    android:id="@+id/subdeps" />
-            </RelativeLayout>
-        </LinearLayout>
+                    android:layoutDirection="rtl"
+                    android:id="@+id/subdeps"
+                    />
+
+
 
 </LinearLayout>
 </RelativeLayout>

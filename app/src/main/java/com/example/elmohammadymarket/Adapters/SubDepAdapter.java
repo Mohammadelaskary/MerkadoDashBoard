@@ -36,20 +36,13 @@ public class SubDepAdapter extends RecyclerView.Adapter<SubDepAdapter.SubDepView
 
     @Override
     public void onBindViewHolder(@NonNull SubDepViewholder holder, int position) {
-        String subdepName = list.get(position).getDepName();
+        String subdepName = list.get(position).getSubdepName();
         String imageUrl = list.get(position).getImageUrl();
-        int discount = list.get(position).getDiscount();
-        String discountUnit = list.get(position).getDiscount_unit();
+     
         holder.subDepName.setText(subdepName);
         if (!imageUrl.isEmpty())
             Glide.with(context).load(imageUrl).into(holder.subdepBackground);
-        if (discount==0){
-            holder.subdepDiscountLayout.setVisibility(View.GONE);
-        } else {
-            String discountText = "حتي" + "\n" + discount +" "+ discountUnit+"\n"+"خصم";
-            holder.subdepDiscountLayout.setVisibility(View.VISIBLE);
-            holder.discountTextView.setText(discountText);
-        }
+
 
     }
 
@@ -59,15 +52,12 @@ public class SubDepAdapter extends RecyclerView.Adapter<SubDepAdapter.SubDepView
     }
 
     static class SubDepViewholder extends RecyclerView.ViewHolder {
-        TextView subDepName,discountTextView;
-        RelativeLayout subdepDiscountLayout;
+        TextView subDepName;
         ImageView subdepBackground;
 
         public SubDepViewholder(@NonNull View itemView) {
             super(itemView);
             subDepName = itemView.findViewById(R.id.subdep_name);
-            discountTextView = itemView.findViewById(R.id.subdep_discount);
-            subdepDiscountLayout = itemView.findViewById(R.id.discount_layout);
             subdepBackground = itemView.findViewById(R.id.subdep_background);
 
         }
