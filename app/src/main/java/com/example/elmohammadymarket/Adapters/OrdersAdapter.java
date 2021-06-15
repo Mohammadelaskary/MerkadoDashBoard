@@ -37,7 +37,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
     public void onBindViewHolder(@NonNull OrdersViewHolder holder, int position) {
         String imageURL = orderList.get(position).getImageURL();
         String product_name = orderList.get(position).getProductName();
-        float orderAmount =  orderList.get(position).getOrdered();
+        String orderAmount =  orderList.get(position).getOrdered();
         String finalPrice = orderList.get(position).getFinalPrice();
         String totalCost = orderList.get(position).getTotalCost();
         String unitWeight = orderList.get(position).getUnitWeight();
@@ -47,14 +47,14 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.OrdersView
             Glide.with(context).load(imageURL).into(holder.imageView);
         Log.d("orderedAmount",orderAmount+"كيلو");
         holder.productName.setText(product_name);
-        holder.orderAmount.setText(String.valueOf(orderAmount));
+        holder.orderAmount.setText(orderAmount);
         holder.unitPrice.setText(finalPrice);
         holder.unitWeight.setText(unitWeight);
     }
 
     @Override
     public int getItemCount() {
-        return orderList.size();
+        return orderList==null?0:orderList.size();
     }
 
     static class OrdersViewHolder extends RecyclerView.ViewHolder {

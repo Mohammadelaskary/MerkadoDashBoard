@@ -95,11 +95,15 @@ import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
 
+
 public class OrdersActivity extends AppCompatActivity implements OnCallClickListener, OnPrintClickListener {
         private static final int REQUEST_CODE_CALL = 100;
         private static final int REQUEST_CODE_SHARE = 200;
         private static final int PRINT_REQUEST_CODE = 300;
-        ActivityOrdersBinding binding;
+        private static final int WRITE_EXTERNAL = 754;
+        private static final int READ_EXTERNAL = 450;
+        private static final int PERMISSION_BLUETOOTH = 650;
+    ActivityOrdersBinding binding;
         List<FullOrder> list = new ArrayList<>();
         FullOrderAdapter adapter;
         PrintOrderAdapter printAdapter;
@@ -163,7 +167,6 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                 binding.fullOrderRecycler.setAdapter(adapter);
                 binding.fullOrderRecycler.setItemAnimator(new DefaultItemAnimator());
                 binding.fullOrderRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, true));
-                binding.fullOrderRecycler.setHasFixedSize(true);
             } else {
                 binding.progressBar.hide();
                 binding.noOrdersText.setVisibility(View.VISIBLE);
@@ -172,72 +175,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 
         }
 
-//        private void connectBluetooth() {
-//            binder.connectBtPort("DC:0D:30:87:94:EE", new UiExecute() {
-//                @Override
-//                public void onsucess() {
-//                   Log.d("blue","connection success");
-//
-//                    binder.write(DataForSendToPrinterPos80.openOrCloseAutoReturnPrintState(0x1f), new UiExecute() {
-//                        @Override
-//                        public void onsucess() {
-//                            binder.acceptdatafromprinter(new UiExecute() {
-//                                @Override
-//                                public void onsucess() {
-//
-//                                }
-//
-//                                @Override
-//                                public void onfailed() {
-//
-//                                }
-//                            });
-//                        }
-//
-//                        @Override
-//                        public void onfailed() {
-//                            Log.d("blue","connection failed");
-//                        }
-//                    });
-//
-//
-//                }
-//
-//                @Override
-//                public void onfailed() {
-//
-//
-//                }
-//            });
-//        }
-//        private void printUSBbitamp(final Bitmap printBmp){
-//
-//
-//
-//                binder.writeDataByYouself(new UiExecute() {
-//                    @Override
-//                    public void onsucess() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onfailed() {
-//
-//                    }
-//                }, new ProcessData() {
-//                    @Override
-//                    public List<byte[]> processDataBeforeSend() {
-//                        List<byte[]> list=new ArrayList<byte[]>();
-//                        list.add(DataForSendToPrinterPos80.initializePrinter());
-//                        list.add(DataForSendToPrinterPos80.printRasterBmp(
-//                                0,printBmp, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Center,576));
-//                        list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
-//                        return list;
-//                    }
-//                });
-//
-//
-//        }
+
 
         @Override
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -292,7 +230,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             FullOrder fullOrder = snapshot.getValue(FullOrder.class);
                             list.add(fullOrder);
-                            Log.d(TAG, "onDataChange: orders" + fullOrder.getUsername());
+                            Log.d(TAG, "onDataChange: orders" + fullOrder.getId());
                             adapter.notifyDataSetChanged();
                             binding.progressBar.hide();
                             binding.noOrders.setVisibility(View.GONE);
@@ -373,78 +311,6 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                 e.printStackTrace();
             }
         }
-        /*
-         * after opening a connection to bluetooth printer device,
-         * we have to listen and check if a data were sent to be printed.
-         */
-    //    void beginListenForData() {
-    //        try {
-    //            final Handler handler = new Handler();
-    //
-    //            // this is the ASCII code for a newline character
-    //            final byte delimiter = 10;
-    //
-    //            stopWorker = false;
-    //            readBufferPosition = 0;
-    //            readBuffer = new byte[1024];
-    //
-    //            workerThread = new Thread(new Runnable() {
-    //                public void run() {
-    //
-    //                    while (!Thread.currentThread().isInterrupted() && !stopWorker) {
-    //
-    //                        try {
-    //
-    //                            int bytesAvailable = mmInputStream.available();
-    //
-    //                            if (bytesAvailable > 0) {
-    //
-    //                                byte[] packetBytes = new byte[bytesAvailable];
-    //                                mmInputStream.read(packetBytes);
-    //
-    //                                for (int i = 0; i < bytesAvailable; i++) {
-    //
-    //                                    byte b = packetBytes[i];
-    //                                    if (b == delimiter) {
-    //
-    //                                        byte[] encodedBytes = new byte[readBufferPosition];
-    //                                        System.arraycopy(
-    //                                                readBuffer, 0,
-    //                                                encodedBytes, 0,
-    //                                                encodedBytes.length
-    //                                        );
-    //
-    //                                        // specify US-ASCII encoding
-    //                                        final String data = new String(encodedBytes, "US-ASCII");
-    //                                        readBufferPosition = 0;
-    //
-    //                                        // tell the user data were sent to bluetooth printer device
-    //                                        handler.post(new Runnable() {
-    //                                            public void run() {
-    //
-    //                                            }
-    //                                        });
-    //
-    //                                    } else {
-    //                                        readBuffer[readBufferPosition++] = b;
-    //                                    }
-    //                                }
-    //                            }
-    //
-    //                        } catch (IOException ex) {
-    //                            stopWorker = true;
-    //                        }
-    //
-    //                    }
-    //                }
-    //            });
-    //
-    //            workerThread.start();
-    //
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //        }
-    //    }
 
 
         @Override
@@ -687,11 +553,9 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                         == PackageManager.PERMISSION_GRANTED) {
                     Log.d("blue", "permissiongranted");
 
-                        try {
-                            printOrder(order);
-                        } catch (Exception e){
 
-                        }
+                            printOrder(order);
+
 
 
 
@@ -703,12 +567,12 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             }
         }
 
-        private void printOrder(FullOrder fullOrder) throws Exception {
+        private void printOrder(FullOrder fullOrder) throws EscPosConnectionException, EscPosParserException, EscPosEncodingException, EscPosBarcodeException {
 
 
             Bitmap receipt = createClusterBitmap(fullOrder);
 
-            printImage(receipt);
+//            printImage(receipt);
 //            Toast.makeText(this, "printed", Toast.LENGTH_SHORT).show();
 //            AlertDialog.Builder alertadd = new AlertDialog.Builder(this);
 //            LayoutInflater factory = LayoutInflater.from(this);
@@ -723,69 +587,50 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 //            });
 //
 //            alertadd.show();
-//            final String customerName = fullOrder.getUsername();
-//            final String address = fullOrder.getAddress();
-//            final String mobileNumber = fullOrder.getMobilePhone();
-//            final float sum = fullOrder.getSum();
-//            final float discount = fullOrder.getDiscount();
-//            final float overAllDiscount = fullOrder.getOverAllDiscount();
-//            final String phoneNumber = fullOrder.getPhoneNumber();
-//            final float netCost = fullOrder.getTotalCost();
-//            final List<OrderProduct> list = fullOrder.getOrders();
-//            final float shipping = fullOrder.getShipping();
-//            String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
 //
-//            ReceiptBuilder receiptBuilder = new ReceiptBuilder(1000);
-//
-//            receiptBuilder.setMargin(0,0).
-//                   addImage(receipt);
-
-
-    //        shareReceipt(receipt);
             String[] permissions = {
                     Manifest.permission.BLUETOOTH,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             };
             if (!hasPermissions(this, permissions)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, MainActivity.PERMISSION_BLUETOOTH);
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivity.PERMISSION_BLUETOOTH);
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MainActivity.PERMISSION_BLUETOOTH);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_BLUETOOTH);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL);
             } else {
 //                   Your code HERE
-//                EscPosPrinter printer = new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(), 203, 78f, 1);
-//                printer
-//                        .printFormattedText(
-//                                "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer,receiptBuilder.build())+"</img>\n"
-//                                +"\n\n\n"
+                EscPosPrinter printer = new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(), 203, 78f, 32);
+                printer
+                        .printFormattedText(
+                                "[C] allah akbar\n"
+                                +"\n\n\n"
+
+                        );
+
+//                //compress the bitmap
+//                Bitmap b1 =convertGreyImg(receipt);
+//                Bitmap b2=resizeImage(b1,576,false);
+////                printpicCode(b2);
 //
-//                        );
-
-                //compress the bitmap
-                Bitmap b1;
-                b1=convertGreyImg(receipt);
-
-//                printpicCode(b1);
-
-//                compress the bitmap
-                Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
-                Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {
-                    @Override
-                    public void callback(boolean isSuccess, Bitmap bitmap) {
-                        if (isSuccess){
-//                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
-
-                           Bitmap b2=resizeImage(bitmap,576,false);
-                            Log.d("receipt",b2.toString());
-                            printpicCode(b2);
-                        }
-
-
-                    }
-                });
+////                compress the bitmap
+//                Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
+//                Tiny.getInstance().source(b2).asBitmap().withOptions(options).compress(new BitmapCallback() {
+//                    @Override
+//                    public void callback(boolean isSuccess, Bitmap bitmap) {
+//                        if (isSuccess){
+////                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
+//
+//
+////                            Log.d("receipt",b2.toString());
+//                            printpicCode(resizeImage(bitmap,576,false));
+//                        }
+//
+//
+//                    }
+//                });
             }
-            // tell the user data were sent
-            Toast.makeText(this, "تم ارسال البيانات", Toast.LENGTH_SHORT).show();
+//            // tell the user data were sent
+//            Toast.makeText(this, "تم ارسال البيانات", Toast.LENGTH_SHORT).show();
 
 
         }
@@ -808,7 +653,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                 List<byte[]> list=new ArrayList<>();
                 list.add(DataForSendToPrinterPos80.initializePrinter());
                 list.add(DataForSendToPrinterPos80.printRasterBmp(
-                        0,printBmp, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Left,576));
+                        0,printBmp, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Center,576));
                 list.add(DataForSendToPrinterPos80.printAndFeedForward(3));
 //                list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
                 return list;
@@ -898,13 +743,13 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             final String customerName = fullOrder.getUsername();
             final String address = fullOrder.getAddress();
             final String mobileNumber = fullOrder.getMobilePhone();
-            final float sum = fullOrder.getSum();
-            final float discount = fullOrder.getDiscount();
-            final float overAllDiscount = fullOrder.getOverAllDiscount();
+            final String sum = fullOrder.getSum();
+            final String discount = fullOrder.getDiscount();
+            final String overAllDiscount = fullOrder.getOverAllDiscount();
             final String phoneNumber = fullOrder.getPhoneNumber();
-            final float netCost = fullOrder.getTotalCost();
+            final String netCost = fullOrder.getTotalCost();
             final List<OrderProduct> list = fullOrder.getOrders();
-            final float shipping = fullOrder.getShipping();
+            final String shipping = fullOrder.getShipping();
             String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
 
 
@@ -1000,28 +845,29 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 
         public void printImage(Bitmap bitmap) {
             Bitmap b1 = convertGreyImg(bitmap);
-            final Bitmap[] b2 = {resizeImage(b1, 576, true)};
 
 
-    //        //compress the bitmap
-    //        Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
-    //        Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {
-    //            @Override
-    //            public void callback(boolean isSuccess, Bitmap bitmap) {
-    //                if (isSuccess) {
-    ////                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
-    //                    b2 = bitmap;
-    ////                            b2=resizeImage(b1,380,false);
-    //
-    //                }
-    //
-    //
-    //            }
-    //        });
-    ////                b2=resizeImage(b1,576,386,false);
-    //    }catch(Exception e){
-    //        e.printStackTrace();
-    //    }
+
+            //compress the bitmap
+            Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
+            Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {
+                @Override
+                public void callback(boolean isSuccess, Bitmap bitmap) {
+                    if (isSuccess) {
+    //                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
+
+                          Bitmap b2=resizeImage(bitmap,380,false);
+
+                    }
+
+
+                }
+            });
+    //                b2=resizeImage(b1,576,386,false);
+//        }catch(Exception e){
+//            e.printStackTrace();
+
+//        }
     }
 
         public Bitmap convertGreyImg(Bitmap img) {

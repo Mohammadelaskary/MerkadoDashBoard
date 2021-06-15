@@ -31,10 +31,12 @@ import com.example.elmohammadymarket.Model.SubDeparment;
 import com.example.elmohammadymarket.Model.TodaysOfferName;
 import com.example.elmohammadymarket.R;
 import com.example.elmohammadymarket.databinding.ActivityAddNewProductBinding;
+import com.google.android.gms.common.util.NumberUtils;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,11 +49,15 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
+import org.apache.commons.codec.binary.StringUtils;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 public class AddNewProduct extends AppCompatActivity {
     private static final int IMAGE_REQUEST = 0;
@@ -75,7 +81,7 @@ public class AddNewProduct extends AppCompatActivity {
     ArrayAdapter<String> subDepsAdapter;
     String depName, subdep, imageUrl, productName, price, unitWeight, discount, discountUnit, count;
     boolean todaysOffer, mostSold;
-    float availableAmount,minimumOrderAmount;
+    String availableAmount,minimumOrderAmount;
     private StorageTask<UploadTask.TaskSnapshot> uploadTask;
 
     @Override
@@ -150,7 +156,7 @@ public class AddNewProduct extends AppCompatActivity {
                 String productName = binding.productPrice.getEditText().getText().toString().trim();
                 if (productName.isEmpty()) {
                     binding.productPrice.setError("ادخل سعر المنتج");
-                } else {
+                }else {
                     binding.productPrice.setError(null);
                 }
 
@@ -170,13 +176,29 @@ public class AddNewProduct extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String productName = binding.unitWeight.getEditText().getText().toString().trim();
-                if (productName.isEmpty()) {
+                String unitWeght = binding.unitWeight.getEditText().getText().toString().trim();
+                if (unitWeght.isEmpty()) {
                     binding.unitWeight.setError("ادخل وزن الوحدة");
-                } else {
+                }  else {
                     binding.unitWeight.setError(null);
                 }
 
+
+            }
+        });
+        binding.minimumOrderAmount.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
 
             }
         });
@@ -222,7 +244,7 @@ public class AddNewProduct extends AppCompatActivity {
     public void addNewProduct() {
         if (add) {
             String productName, subDep, productPrice, department, unitWeight, discount, discountUnit;
-            float availableAmount,minimumOrderAmount;
+            BigDecimal availableAmount,minimumOrderAmount;
             productName = Objects.requireNonNull(binding.productName.getEditText()).getText().toString().trim();
             subDep = binding.subdepName.getSelectedItem().toString();
             productPrice = Objects.requireNonNull(binding.productPrice.getEditText()).getText().toString().trim();
@@ -230,15 +252,15 @@ public class AddNewProduct extends AppCompatActivity {
             unitWeight = Objects.requireNonNull(binding.unitWeight.getEditText()).getText().toString().trim();
             discount = Objects.requireNonNull(binding.discount.getEditText()).getText().toString().trim();
             discountUnit = binding.discountType.getSelectedItem().toString();
-            availableAmount = Float.parseFloat(binding.availableAmount.getEditText().getText().toString().trim());
-            minimumOrderAmount = Float.parseFloat(binding.minimumOrderAmount.getEditText().getText().toString().trim());
+            availableAmount = new BigDecimal(binding.availableAmount.getEditText().getText().toString().trim());
+            minimumOrderAmount = new BigDecimal(binding.minimumOrderAmount.getEditText().getText().toString().trim());
             todaysOffer = binding.todaysOffer.isChecked();
             mostSold = binding.mostSold.isChecked();
 
             if (binding.availableAmount.getEditText().getText().toString().trim().isEmpty())
-                availableAmount = 0;
+                availableAmount = BigDecimal.ZERO;
             product = new Product(department, subDep, productName, productPrice
-                    , unitWeight, discount, discountUnit, availableAmount, todaysOffer, mostSold,minimumOrderAmount);
+                    , unitWeight, discount, discountUnit, String.valueOf(availableAmount), todaysOffer, mostSold,String.valueOf(minimumOrderAmount),-1);
             product.setCount("0");
             boolean validateDiscount = true;
 
@@ -264,7 +286,9 @@ public class AddNewProduct extends AppCompatActivity {
                 binding.productPrice.setError("ادخل سعر المنتج");
             if (unitWeight.isEmpty())
                 binding.unitWeight.setError("ادخل وزن الوحدة");
-            if (!productName.isEmpty() && !productPrice.isEmpty() && !unitWeight.isEmpty() && validateDiscount) {
+            if (minimumOrderAmount.equals(BigDecimal.ZERO))
+                binding.unitWeight.setError("ادخل أقل كمية للطلب");
+            if (!productName.isEmpty() && !productPrice.isEmpty() && !unitWeight.isEmpty()&& !minimumOrderAmount.equals(BigDecimal.ZERO) && validateDiscount) {
 
                 if (!productsNames.contains(productName)) {
 
@@ -286,7 +310,7 @@ public class AddNewProduct extends AppCompatActivity {
         } else {
 
             String productName, productPrice, department, subdep, unitWeight, discount, discountUnit;
-            float availableAmount,minimumOrderAmount;
+            BigDecimal availableAmount,minimumOrderAmount;
             productName = binding.productName.getEditText().getText().toString().trim();
             productPrice = binding.productPrice.getEditText().getText().toString().trim();
             department = binding.depName.getSelectedItem().toString();
@@ -294,12 +318,12 @@ public class AddNewProduct extends AppCompatActivity {
             unitWeight = binding.unitWeight.getEditText().getText().toString().trim();
             discount = binding.discount.getEditText().getText().toString().trim();
             discountUnit = binding.discountType.getSelectedItem().toString();
-            availableAmount = Float.parseFloat(binding.availableAmount.getEditText().getText().toString().trim());
-            minimumOrderAmount = Float.parseFloat(binding.minimumOrderAmount.getEditText().getText().toString().trim());
+            availableAmount = new BigDecimal(binding.availableAmount.getEditText().getText().toString().trim());
+            minimumOrderAmount = new BigDecimal(binding.minimumOrderAmount.getEditText().getText().toString().trim());
             boolean mostSold = binding.mostSold.isChecked();
             boolean todaysOffer = binding.todaysOffer.isChecked();
             if (binding.availableAmount.getEditText().getText().toString().isEmpty())
-                availableAmount = 0;
+                availableAmount = BigDecimal.ZERO;
 
 
             final HashMap<String, Object> map = new HashMap<>();
@@ -310,12 +334,12 @@ public class AddNewProduct extends AppCompatActivity {
             map.put("unitWeight", unitWeight);
             map.put("discount", discount);
             map.put("discountUnit", discountUnit);
-            map.put("availableAmount", availableAmount);
+            map.put("availableAmount", availableAmount.toString());
             map.put("todaysOffer", todaysOffer);
             map.put("mostSold", mostSold);
             map.put("subDep", subdep);
             map.put("count", count);
-            map.put("minimumOrderAmount",minimumOrderAmount);
+            map.put("minimumOrderAmount",minimumOrderAmount.toString());
             boolean validateDiscount = true;
 
             if (discountUnit.equals("جنيه") && !binding.discount.getEditText().getText().toString().isEmpty() && !binding.productPrice.getEditText().getText().toString().isEmpty()) {
@@ -426,6 +450,7 @@ public class AddNewProduct extends AppCompatActivity {
                     FancyToast.makeText(getApplicationContext(), e.getMessage()
                             , FancyToast.LENGTH_LONG, FancyToast.ERROR, false).show();
                     progressDialog.dismiss();
+                    Log.d("upload product error",e.getMessage());
 
                 }
             });
@@ -600,7 +625,9 @@ public class AddNewProduct extends AppCompatActivity {
 
     }
 
-
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
     private String getFileExtension(Uri imageUri) {
         ContentResolver contentResolver = Objects.requireNonNull(getApplicationContext()).getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
@@ -621,18 +648,18 @@ public class AddNewProduct extends AppCompatActivity {
         unitWeight = bundle.getString("unitWeight");
         discount = bundle.getString("discount");
         discountUnit = bundle.getString("discountUnit");
-        availableAmount = bundle.getFloat("availableAmount");
+        availableAmount = bundle.getString("availableAmount");
         count = bundle.getString("count");
         todaysOffer = bundle.getBoolean("todaysOffer");
         mostSold = bundle.getBoolean("mostSold");
-        minimumOrderAmount = bundle.getFloat("minimumOrderAmount");
+        minimumOrderAmount = bundle.getString("minimumOrderAmount");
         binding.productName.getEditText().setText(productName);
         binding.productPrice.getEditText().setText(price);
         binding.unitWeight.getEditText().setText(unitWeight);
-        if (availableAmount == 0) {
+        if (new BigDecimal(availableAmount).equals(BigDecimal.ZERO)) {
             binding.availableAmount.getEditText().setText("");
         } else
-            binding.availableAmount.getEditText().setText(String.valueOf(availableAmount));
+            binding.availableAmount.getEditText().setText(availableAmount);
 
         binding.discount.getEditText().setText(discount);
 
@@ -650,7 +677,7 @@ public class AddNewProduct extends AppCompatActivity {
             Glide.with(AddNewProduct.this).load(imageUrl).into(binding.addImage);
         }
 
-        binding.minimumOrderAmount.getEditText().setText(String.valueOf(minimumOrderAmount));
+        binding.minimumOrderAmount.getEditText().setText(minimumOrderAmount);
 
     }
 

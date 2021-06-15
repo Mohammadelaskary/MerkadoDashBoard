@@ -3,12 +3,12 @@ package com.example.elmohammadymarket.Model;
 public class PointsDiscount {
     private boolean freeShipping;
     private int numberOfPoints;
-    private float discountValue;
+    private String discountValue;
 
     public PointsDiscount() {
     }
 
-    public PointsDiscount(boolean freeShipping, int numberOfPoints, float discountValue) {
+    public PointsDiscount(boolean freeShipping, int numberOfPoints, String discountValue) {
         this.freeShipping = freeShipping;
         this.numberOfPoints = numberOfPoints;
         this.discountValue = discountValue;
@@ -30,11 +30,11 @@ public class PointsDiscount {
         this.numberOfPoints = numberOfPoints;
     }
 
-    public float getDiscountValue() {
+    public String getDiscountValue() {
         return discountValue;
     }
 
-    public void setDiscountValue(float discountValue) {
+    public void setDiscountValue(String discountValue) {
         this.discountValue = discountValue;
     }
 }

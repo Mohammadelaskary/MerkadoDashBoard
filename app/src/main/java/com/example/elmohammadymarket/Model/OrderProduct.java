@@ -5,15 +5,15 @@ public class OrderProduct {
     private int id;
     private String ImageURL;
     private String productName;
-    private float ordered;
+    private String ordered;
     private String originalPrice;
     private String discount;
     private String discountType;
     private String finalPrice;
     private String totalCost;
     private String unitWeight;
-    private float available;
-    private float minimumOrderAmount;
+    private String available;
+    private String minimumOrderAmount;
 
     public OrderProduct() {
     }
@@ -66,15 +66,15 @@ public class OrderProduct {
         this.discountType = discountType;
     }
 
-    public float getMinimumOrderAmount() {
+    public String getMinimumOrderAmount() {
         return minimumOrderAmount;
     }
 
-    public void setMinimumOrderAmount(float minimumOrderAmount) {
+    public void setMinimumOrderAmount(String minimumOrderAmount) {
         this.minimumOrderAmount = minimumOrderAmount;
     }
 
-    public OrderProduct(String imageURL, String productName, float ordered, String originalPrice, String discount, String discountType, String unitWeight, float minimumOrderAmount) {
+    public OrderProduct(String imageURL, String productName, String ordered, String originalPrice, String discount, String discountType, String unitWeight, String minimumOrderAmount) {
         this.ImageURL = imageURL;
         this.productName = productName;
         this.ordered = ordered;
@@ -110,19 +110,19 @@ public class OrderProduct {
         this.productName = productName;
     }
 
-    public float getOrdered() {
+    public String getOrdered() {
         return ordered;
     }
 
-    public void setOrdered(float ordered) {
+    public void setOrdered(String ordered) {
         this.ordered = ordered;
     }
 
-    public float getAvailable() {
+    public String getAvailable() {
         return available;
     }
 
-    public void setAvailable(float available) {
+    public void setAvailable(String available) {
         this.available = available;
     }
 }

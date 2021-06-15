@@ -39,7 +39,7 @@ public class ComplaintsActivity extends AppCompatActivity {
             adapter = new ComplaintsAdapter(this, list);
             binding.complaintsRecycler.setAdapter(adapter);
             binding.complaintsRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-            binding.complaintsRecycler.setHasFixedSize(true);
+
         } else {
             binding.progressBar.hide();
             binding.noComplaintsText.setVisibility(View.VISIBLE);

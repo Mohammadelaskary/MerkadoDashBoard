@@ -224,6 +224,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="أقل كمية للطلب"
+                    android:inputType="numberDecimal"
                     android:background="@drawable/empty_edit_text"
                     android:padding="@dimen/_5sdp" />
             </com.google.android.material.textfield.TextInputLayout>

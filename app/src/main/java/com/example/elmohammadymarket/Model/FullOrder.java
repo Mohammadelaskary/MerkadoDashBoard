@@ -9,11 +9,11 @@ public class FullOrder {
     private String phoneNumber;
     private String address;
     private List<OrderProduct> orders;
-    private float sum;
-    private float discount;
-    private float overAllDiscount;
-    private float shipping;
-    private float totalCost;
+    private String sum;
+    private String discount;
+    private String overAllDiscount;
+    private String shipping;
+    private String totalCost;
     private String date;
     private String time;
     private boolean done;
@@ -22,7 +22,7 @@ public class FullOrder {
     private String userId;
     private boolean isStillAvailable;
 
-    public FullOrder(String date, String time, boolean done, boolean shiped, boolean seen, String username, String mobilePhone, String phoneNumber, String address, List<OrderProduct> orders, float sum, float discount, float overAllDiscount, float shipping, float totalCost,  String userId,boolean isStillAvailable) {
+    public FullOrder(String date, String time, boolean done, boolean shiped, boolean seen, String username, String mobilePhone, String phoneNumber, String address, List<OrderProduct> orders, String sum, String discount, String overAllDiscount, String shipping, String totalCost,  String userId,boolean isStillAvailable) {
         this.username = username;
         this.mobilePhone = mobilePhone;
         this.phoneNumber = phoneNumber;
@@ -146,43 +146,43 @@ public class FullOrder {
         this.orders = orders;
     }
 
-    public float getSum() {
+    public String getSum() {
         return sum;
     }
 
-    public void setSum(float sum) {
+    public void setSum(String sum) {
         this.sum = sum;
     }
 
-    public float getDiscount() {
+    public String getDiscount() {
         return discount;
     }
 
-    public void setDiscount(float discount) {
+    public void setDiscount(String discount) {
         this.discount = discount;
     }
 
-    public float getOverAllDiscount() {
+    public String getOverAllDiscount() {
         return overAllDiscount;
     }
 
-    public void setOverAllDiscount(float overAllDiscount) {
+    public void setOverAllDiscount(String overAllDiscount) {
         this.overAllDiscount = overAllDiscount;
     }
 
-    public float getShipping() {
+    public String getShipping() {
         return shipping;
     }
 
-    public void setShipping(float shipping) {
+    public void setShipping(String shipping) {
         this.shipping = shipping;
     }
 
-    public float getTotalCost() {
+    public String getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(float totalCost) {
+    public void setTotalCost(String totalCost) {
         this.totalCost = totalCost;
     }
 

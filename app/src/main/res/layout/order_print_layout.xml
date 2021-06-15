@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_height="match_parent"
-    android:layout_width="@dimen/print_width"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-<LinearLayout
-    android:orientation="vertical"
+
+<LinearLayout android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
-    android:layoutDirection="rtl">
+    android:layoutDirection="rtl"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <ImageView
         android:src="@drawable/ic_mercado_logo_small"
         android:layout_width="@dimen/image_width"
@@ -198,6 +196,7 @@
         android:layout_height="@dimen/_1sdp"
         android:background="#222"
         android:layout_margin="@dimen/print_margin"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/order_products"
         android:layout_width="match_parent"
@@ -367,4 +366,3 @@
             android:textSize="@dimen/print_font_size"/>
     </LinearLayout>
 </LinearLayout>
-</ScrollView>

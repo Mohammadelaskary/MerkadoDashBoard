@@ -54,7 +54,7 @@ public class ChangeShipping extends AppCompatActivity {
                     binding.shippingFee.setError("ادخل مصاريف الشحن");
                 else {
                     Shipping shipping = new Shipping();
-                    shipping.setShippingFee(Float.parseFloat(shippingFee));
+                    shipping.setShippingFee(shippingFee);
                     uploadShippingFee(shipping);
                 }
             }
@@ -77,7 +77,7 @@ public class ChangeShipping extends AppCompatActivity {
                 if (snapshot.exists()) {
                     Shipping shipping = snapshot.getValue(Shipping.class);
                     assert shipping != null;
-                    binding.currentShippingFee.setText(String.valueOf(shipping.getShippingFee()));
+                    binding.currentShippingFee.setText(String.format("%.3f",shipping.getShippingFee()).replaceAll("\\.?0*$", "")+"جنيه");
                     binding.currentShippingFee.setVisibility(View.VISIBLE);
                 } else {
                     binding.currentShippingFee.setText("10 جنيه");

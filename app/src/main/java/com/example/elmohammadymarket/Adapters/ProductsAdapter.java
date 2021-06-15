@@ -1,6 +1,8 @@
 package com.example.elmohammadymarket.Adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.elmohammadymarket.Database.Product;
 import com.example.elmohammadymarket.Model.Cart;
 import com.example.elmohammadymarket.Model.User;
+import com.example.elmohammadymarket.OnDeleteProductClicked;
 import com.example.elmohammadymarket.R;
 import com.example.elmohammadymarket.Views.AddNewProduct;
 import com.google.firebase.database.DataSnapshot;
@@ -29,14 +32,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ProductsViewholder> {
     Context context;
     List<Product> productList;
-    DatabaseReference ref;
+    DatabaseReference  ref = FirebaseDatabase.getInstance().getReference();
     List<Product> deletedItems;
     List<String> mostSoldList = new ArrayList();
     List<User> users = new ArrayList<>();
@@ -68,14 +75,18 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         final String unitWeight = productList.get(position).getUnitWeight();
         final String discount = productList.get(position).getDiscount();
         final String discountType = productList.get(position).getDiscountUnit();
-        final float availableAmount = productList.get(position).getAvailableAmount();
-        final float minimumOrderAmount = productList.get(position).getMinimumOrderAmount();
+        final String availableAmount = productList.get(position).getAvailableAmount();
+        final String minimumOrderAmount = productList.get(position).getMinimumOrderAmount();
         final String count = productList.get(position).getCount();
         final boolean mostSold = productList.get(position).isMostSold();
         final boolean todaysOffer = productList.get(position).isTodaysOffer();
-
+        int productPosition = productList.get(position).getPosition();
+        Log.d("position",productPosition+"");
+        if (productPosition == -1){
+            updatePosition(position,productName);
+        }
         deletedItems = new ArrayList<>();
-        if (availableAmount == 0) {
+        if (Float.parseFloat(availableAmount) == 0) {
             holder.unavailable.setVisibility(View.VISIBLE);
             holder.unavailableImage.setVisibility(View.VISIBLE);
         } else {
@@ -91,14 +102,14 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
             holder.discount.setText("خصم " + discount + " " + discountType);
             holder.discountPrice.setVisibility(View.VISIBLE);
             holder.discountPrice.setText("بدلا من " + price + " جنيه");
-            float priceValue = Float.parseFloat(price);
-            float discountValue = Float.parseFloat(discount);
+            BigDecimal priceValue = new BigDecimal(price);
+            BigDecimal discountValue = new BigDecimal(discount);
             String finalPrice = "";
             if (discountType.equals("جنيه")) {
-                float finalPriceValue = priceValue - discountValue;
+                BigDecimal finalPriceValue = priceValue.subtract(discountValue);
                 finalPrice = String.valueOf(finalPriceValue);
             } else if (discountType.equals("%")) {
-                float finalPriceValue = priceValue * (1 - (discountValue / 100));
+                BigDecimal finalPriceValue = priceValue.multiply(BigDecimal.ONE .subtract(discountValue.divide(new BigDecimal(100))));
                 finalPrice = String.valueOf(finalPriceValue);
             }
             holder.productFinal.setText(finalPrice + " " + "جنيه/" + unitWeight);
@@ -122,53 +133,63 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                new AlertDialog.Builder(context).setTitle("تحذير!")
+                        .setMessage("هل أنت متأكدة من حذف " +productName + " ?")
+                        .setIcon(R.drawable.ic_warning)
+                        .setPositiveButton("نعم", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
+                                StorageReference storageReference = mStorageRef.child("Images/" + productList.get(position).getImageFileName());
+                                storageReference.delete();
+                                if (productList.get(position).isMostSold()) {
+                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("MostSold");
+                                    Query query1 = reference.orderByChild("productName").equalTo(productName);
+                                    query1.getRef().removeValue();
+                                }
+                                if (productList.get(position).isTodaysOffer()) {
+                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("TodaysOffer");
+                                    Query query1 = reference.orderByChild("productName").equalTo(productName);
+                                    query1.getRef().removeValue();
+                                }
 
+                                final Query query = ref.child("Products").orderByChild("productName").equalTo(productName);
+                                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
-                StorageReference storageReference = mStorageRef.child("Images/" + productList.get(position).getImageFileName());
-                storageReference.delete();
-                if (productList.get(position).isMostSold()) {
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("MostSold");
-                    Query query1 = reference.orderByChild("productName").equalTo(productName);
-                    query1.getRef().removeValue();
-                }
-                if (productList.get(position).isTodaysOffer()) {
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("TodaysOffer");
-                    Query query1 = reference.orderByChild("productName").equalTo(productName);
-                    query1.getRef().removeValue();
-                }
-                ref = FirebaseDatabase.getInstance().getReference();
-                final Query query = ref.child("Products").orderByChild("productName").equalTo(productName);
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                            snapshot1.getRef().setValue(null);
+                                        }
+                                        getMostSoldProducts();
+                                        getTodaysOfferProducts();
+                                        if (mostSoldList.contains(productName)) {
+                                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("MostSold");
+                                            Query query1 = reference.orderByChild("productName").equalTo(productName);
+                                            query1.getRef().removeValue();
+                                        }
+                                        if (todaysOfferList.contains(productName)) {
+                                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("TodaysOffer");
+                                            Query query1 = reference.orderByChild("productName").equalTo(productName);
+                                            query1.getRef().removeValue();
+                                        }
+                                    }
 
-                        for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                            snapshot1.getRef().setValue(null);
-                        }
-                        getMostSoldProducts();
-                        getTodaysOfferProducts();
-                        if (mostSoldList.contains(productName)) {
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("MostSold");
-                            Query query1 = reference.orderByChild("productName").equalTo(productName);
-                            query1.getRef().removeValue();
-                        }
-                        if (todaysOfferList.contains(productName)) {
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("TodaysOffer");
-                            Query query1 = reference.orderByChild("productName").equalTo(productName);
-                            query1.getRef().removeValue();
-                        }
-                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
+                                });
+                                deleteFromCart(productName);
 
-                    }
-                });
-                deleteFromCart(productName);
-
-            }
+                            }
+                        })
+                .setNegativeButton("لا",null)
+                .show();
+                            }
         });
+
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,13 +207,33 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
                 bundle.putString("unitWeight", unitWeight);
                 bundle.putString("discount", discount);
                 bundle.putString("discountUnit", discountType);
-                bundle.putFloat("availableAmount", availableAmount);
+                bundle.putString("availableAmount", availableAmount);
                 bundle.putString("count", count);
                 bundle.putBoolean("todaysOffer", todaysOffer);
                 bundle.putBoolean("mostSold", mostSold);
-                bundle.putFloat("minimumOrderAmount",minimumOrderAmount);
+                bundle.putString("minimumOrderAmount",minimumOrderAmount);
                 intent.putExtras(bundle);
                 context.startActivity(intent);
+            }
+        });
+
+
+    }
+
+    private void updatePosition(int position,String productName) {
+        Map<String, Object> newPosition = new HashMap<>();
+        newPosition.put("position",position);
+        Query query = ref.child("Products").orderByChild("productName").equalTo(productName);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot:snapshot.getChildren())
+                    dataSnapshot.getRef().updateChildren(newPosition);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 

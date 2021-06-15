@@ -77,13 +77,13 @@ public class RedeemPoints extends AppCompatActivity {
                         } else {
                             discountValue = Float.parseFloat(discountValueText);
                             numberOfPoints = Integer.parseInt(numberOfPointsText);
-                            PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, discountValue);
+                            PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, String.valueOf(discountValue));
                             uploadDiscount(pointsDiscount);
                         }
                     } else {
                         discountValue = 0;
                         numberOfPoints = Integer.parseInt(numberOfPointsText);
-                        PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, discountValue);
+                        PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, String.valueOf(discountValue));
                         uploadDiscount(pointsDiscount);
                     }
 
@@ -108,13 +108,13 @@ public class RedeemPoints extends AppCompatActivity {
                         } else {
                             discountValue = Float.parseFloat(discountValueText);
                             numberOfPoints = Integer.parseInt(numberOfPointsText);
-                            PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, discountValue);
+                            PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, String.valueOf(discountValue));
                             uploadDiscount2(pointsDiscount);
                         }
                     } else {
                         discountValue = 0;
                         numberOfPoints = Integer.parseInt(numberOfPointsText);
-                        PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, discountValue);
+                        PointsDiscount pointsDiscount = new PointsDiscount(freeShipping, numberOfPoints, String.valueOf(discountValue));
                         uploadDiscount2(pointsDiscount);
                     }
 
@@ -164,13 +164,13 @@ public class RedeemPoints extends AppCompatActivity {
                 if (snapshot.exists()) {
                     PointsDiscount pointsDiscount = snapshot.getValue(PointsDiscount.class);
                     boolean freeShipping = pointsDiscount.isFreeShipping();
-                    float discountValue  = pointsDiscount.getDiscountValue();
+                    String discountValue  = pointsDiscount.getDiscountValue();
                     int pointsNumber     = pointsDiscount.getNumberOfPoints();
                     binding.minPoints1.getEditText().setText(String.valueOf(pointsNumber));
                     binding.freeShipping1.setChecked(freeShipping);
                     binding.discount1.setChecked(!freeShipping);
                     binding.discount1.setChecked(!freeShipping);
-                    if (discountValue !=0)
+                    if (Float.parseFloat(discountValue) !=0)
                         binding.discountValue1.setText(String.valueOf(discountValue));
 
                 }
@@ -191,13 +191,13 @@ public class RedeemPoints extends AppCompatActivity {
                 if (snapshot.exists()) {
                     PointsDiscount pointsDiscount = snapshot.getValue(PointsDiscount.class);
                     boolean freeShipping = pointsDiscount.isFreeShipping();
-                    float discountValue  = pointsDiscount.getDiscountValue();
+                    String discountValue  = pointsDiscount.getDiscountValue();
                     int pointsNumber     = pointsDiscount.getNumberOfPoints();
                     binding.minPoints2.getEditText().setText(String.valueOf(pointsNumber));
                     binding.freeShipping2.setChecked(freeShipping);
                     binding.discount2.setChecked(!freeShipping);
                     binding.discount2.setChecked(!freeShipping);
-                    if (discountValue !=0)
+                    if (Float.parseFloat(discountValue) !=0)
                     binding.discountValue2.setText(String.valueOf(discountValue));
                 }
             }

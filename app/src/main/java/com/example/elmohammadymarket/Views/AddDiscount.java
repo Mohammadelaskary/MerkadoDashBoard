@@ -37,7 +37,7 @@ public class AddDiscount extends AppCompatActivity {
         final DiscountAdapter adapter = new DiscountAdapter(this, discountList);
         binding.currentDiscounts.setAdapter(adapter);
         binding.currentDiscounts.setLayoutManager(new LinearLayoutManager(this));
-        binding.currentDiscounts.setHasFixedSize(true);
+
 
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("OverTotalMoneyDiscount");

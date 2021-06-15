@@ -2,9 +2,9 @@ package com.example.elmohammadymarket.Model;
 
 public class Cart {
     private String productName;
-    private float numberOfProducts;
+    private String numberOfProducts;
 
-    public Cart(String productName, float numberOfProducts) {
+    public Cart(String productName, String numberOfProducts) {
         this.productName = productName;
         this.numberOfProducts = numberOfProducts;
     }
@@ -20,11 +20,11 @@ public class Cart {
         this.productName = productName;
     }
 
-    public float getNumberOfProducts() {
+    public String getNumberOfProducts() {
         return numberOfProducts;
     }
 
-    public void setNumberOfProducts(float numberOfProducts) {
+    public void setNumberOfProducts(String numberOfProducts) {
         this.numberOfProducts = numberOfProducts;
     }
 }

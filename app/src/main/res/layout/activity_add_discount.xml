@@ -21,6 +21,7 @@
         android:paddingStart="@dimen/_10sdp"
         android:paddingEnd="@dimen/_10sdp"
         app:errorEnabled="true"
+
         android:layout_marginBottom="@dimen/_5sdp"
         android:layout_marginTop="@dimen/_30sdp">
 
@@ -30,7 +31,8 @@
             android:hint="الحد الأدني للخصم"
             android:background="@drawable/empty_edit_text"
             android:padding="@dimen/_2sdp"
-            android:enabled="true" />
+            android:enabled="true"
+            android:inputType="numberDecimal"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -65,7 +67,8 @@
                 android:hint="الخصم"
                 android:background="@drawable/empty_edit_text"
                 android:padding="@dimen/_2sdp"
-                android:enabled="true" />
+                android:enabled="true"
+                android:inputType="numberDecimal"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 

@@ -8,30 +8,43 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.elmohammadymarket.Adapters.ProductsAdapter;
 import com.example.elmohammadymarket.Database.Product;
+import com.example.elmohammadymarket.OnDeleteProductClicked;
 import com.example.elmohammadymarket.databinding.ActivityProductsBinding;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Products extends AppCompatActivity {
     ActivityProductsBinding binding;
     ProductsAdapter adapter;
     List<Product> products;
     String depName, subdep;
+    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +59,10 @@ public class Products extends AppCompatActivity {
         Log.d("subdep", subdep);
         binding.depName.setText(depName);
         binding.subdep.setText(subdep);
+
         if (isConnected()) {
             binding.progressBar.setVisibility(View.VISIBLE);
-            new GetProducts().execute(depName);
+            getProducts(depName);
 
         } else {
             binding.progressBar.setVisibility(View.GONE);
@@ -66,14 +80,29 @@ public class Products extends AppCompatActivity {
 
     }
 
-    private class GetProducts extends AsyncTask<String, Void, Void> {
 
-        @Override
-        protected Void doInBackground(String... strings) {
-            getProducts(strings[0]);
-            return null;
-        }
+
+
+    private void updatePosition(int position,String productName) {
+        Map<String, Object> newPosition = new HashMap<>();
+        newPosition.put("position",position);
+        Query query = ref.child("Products").orderByChild("productName").equalTo(productName);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot:snapshot.getChildren())
+                    dataSnapshot.getRef().updateChildren(newPosition);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
     }
+
 
     private void getProducts(final String string) {
 
@@ -95,13 +124,15 @@ public class Products extends AppCompatActivity {
                             adapter.notifyDataSetChanged();
                         }
                     }
+
+
+
                 } else {
                     binding.products.setVisibility(View.GONE);
                     binding.noProductsText.setVisibility(View.VISIBLE);
                     binding.noProductsText.setText("لا يوجد منتجات");
                 }
                 binding.progressBar.hide();
-
 
             }
 
@@ -110,6 +141,8 @@ public class Products extends AppCompatActivity {
 
             }
         });
+
+
     }
 
     public boolean isConnected() {
@@ -121,5 +154,11 @@ public class Products extends AppCompatActivity {
             connected = true;
         }
         return connected;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
     }
 }

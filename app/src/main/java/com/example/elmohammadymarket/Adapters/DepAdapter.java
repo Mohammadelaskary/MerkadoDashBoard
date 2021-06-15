@@ -44,7 +44,6 @@ public class DepAdapter extends RecyclerView.Adapter<DepAdapter.DepsViewholder> 
         linearLayoutManager.setInitialPrefetchItemCount(dep.getProductList().size());
         holder.main_recycler_view.setRecycledViewPool(viewPool);
         holder.main_recycler_view.setLayoutManager(linearLayoutManager);
-        holder.main_recycler_view.setHasFixedSize(true);
 
 
     }

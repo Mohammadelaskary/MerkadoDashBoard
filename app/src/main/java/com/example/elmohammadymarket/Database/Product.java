@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 import org.jetbrains.annotations.NotNull;
 
 @Entity
-public class Product {
+public class Product  {
     private String imageUrl;
     private String imageFileName;
     private String dep;
@@ -20,14 +20,16 @@ public class Product {
     private String unitWeight;
     private String discount;
     private String discountUnit;
-    private float availableAmount;
+    private String availableAmount;
     private String count;
     private boolean mostSold;
     private boolean todaysOffer;
-    private float minimumOrderAmount;
+
+    private String minimumOrderAmount;
+    private int position;
 
     @Ignore
-    public Product(String dep, String subDep, @NotNull String productName, String price, String unitWeight, String discount, String discountUnit, float availableAmount, boolean todaysOffer, boolean mostSold,float minimumOrderAmount) {
+    public Product(String dep, String subDep, @NotNull String productName, String price, String unitWeight, String discount, String discountUnit, String availableAmount, boolean todaysOffer, boolean mostSold,String minimumOrderAmount,int position) {
         this.dep = dep;
         this.subDep = subDep;
         this.productName = productName;
@@ -39,25 +41,34 @@ public class Product {
         this.todaysOffer = todaysOffer;
         this.mostSold = mostSold;
         this.minimumOrderAmount = minimumOrderAmount;
+        this.position=position;
     }
 
     public Product() {
         productName = null;
     }
 
-    public float getMinimumOrderAmount() {
+    public String getMinimumOrderAmount() {
         return minimumOrderAmount;
     }
 
-    public void setMinimumOrderAmount(float minimumOrderAmount) {
+    public void setMinimumOrderAmount(String minimumOrderAmount) {
         this.minimumOrderAmount = minimumOrderAmount;
     }
 
-    public void setAvailableAmount(float availableAmount) {
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public void setAvailableAmount(String availableAmount) {
         this.availableAmount = availableAmount;
     }
 
-    public float getAvailableAmount() {
+    public String getAvailableAmount() {
         return availableAmount;
     }
 
@@ -159,6 +170,7 @@ public class Product {
     public void setDiscountUnit(String discountUnit) {
         this.discountUnit = discountUnit;
     }
+
 
 
 }

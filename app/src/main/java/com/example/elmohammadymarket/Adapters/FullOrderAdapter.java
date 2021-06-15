@@ -98,16 +98,16 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         final String date = ordersList.get(position).getDate();
         final String address = ordersList.get(position).getAddress();
         final String mobileNumber = ordersList.get(position).getMobilePhone();
-        final float sum = ordersList.get(position).getSum();
-        final float discount = ordersList.get(position).getDiscount();
-        final float overAllDiscount = ordersList.get(position).getOverAllDiscount();
+        final String sum = ordersList.get(position).getSum();
+        final String discount = ordersList.get(position).getDiscount();
+        final String overAllDiscount = ordersList.get(position).getOverAllDiscount();
         final String phoneNumber = ordersList.get(position).getPhoneNumber();
-        final float netCost = ordersList.get(position).getTotalCost();
+        final String netCost = ordersList.get(position).getTotalCost();
         final List<OrderProduct> list = ordersList.get(position).getOrders();
         final boolean isDone = ordersList.get(position).isDone();
         final boolean shiped = ordersList.get(position).isShiped();
         final boolean seen = ordersList.get(position).isSeen();
-        final float shipping = ordersList.get(position).getShipping();
+        final String shipping = ordersList.get(position).getShipping();
         id = ordersList.get(position).getId();
         final String userId = ordersList.get(position).getUserId();
         final boolean isStillAvailable = ordersList.get(position).isStillAvailable();
@@ -116,15 +116,14 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         holder.date.setText(date);
         holder.address.setText(address);
         holder.phoneNumber.setText(phoneNumber);
-        holder.totalCost.setText(String.valueOf(netCost));
+        holder.totalCost.setText(netCost);
         OrdersAdapter adapter = new OrdersAdapter(context, list);
         holder.orders.setAdapter(adapter);
         holder.orders.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-        holder.orders.setHasFixedSize(true);
-        holder.shipping.setText(String.valueOf(shipping));
-        holder.sumText.setText(String.valueOf(sum));
-        holder.discountText.setText(String.valueOf(discount));
-        holder.overallDiscount.setText(String.valueOf(overAllDiscount));
+        holder.shipping.setText(shipping);
+        holder.sumText.setText(sum);
+        holder.discountText.setText(discount);
+        holder.overallDiscount.setText(overAllDiscount);
         holder.mobileNumber.setText(mobileNumber);
         holder.call.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,7 +146,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    FullOrder order = new FullOrder(date, time, true, shiped, seen, customerName, mobileNumber, phoneNumber, address, list, sum, discount, overAllDiscount, shipping, netCost,  userId,isStillAvailable);
+                    FullOrder order = new FullOrder(date, time, true, shiped, seen, customerName, mobileNumber, phoneNumber, address, list, String.valueOf(sum), String.valueOf(discount), String.valueOf(overAllDiscount), String.valueOf(shipping), String.valueOf(netCost),  String.valueOf(userId),isStillAvailable);
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Done orders");
                     reference.push().setValue(order);
                     Query query = ref.child("Orders").orderByChild("id").equalTo(id);

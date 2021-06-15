@@ -63,7 +63,6 @@ public class PreOrdersActivity extends AppCompatActivity {
         adapter = new DatesAdapter(dates, this);
         binding.datesRec.setAdapter(adapter);
         binding.datesRec.setLayoutManager(new LinearLayoutManager(this));
-        binding.datesRec.setHasFixedSize(true);
     }
 
     public String convertToEnglish(String value) {

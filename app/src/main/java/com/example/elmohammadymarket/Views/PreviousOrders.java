@@ -90,7 +90,6 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
             adapter = new FullOrderAdapter(this,list, false, this,this);
             binding.fullOrderRecycler.setAdapter(adapter);
             binding.fullOrderRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-            binding.fullOrderRecycler.setHasFixedSize(true);
 
         } else {
             binding.progressBar.hide();
@@ -148,15 +147,15 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
             HSSFCell cellL = rowB.createCell(3);
             cellL.setCellValue(new HSSFRichTextString(order.getAddress()));
             HSSFCell cellM = rowB.createCell(4);
-            cellM.setCellValue(new HSSFRichTextString(String.valueOf(order.getSum())));
+            cellM.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getSum()).replaceAll("\\.?0*$", "")));
             HSSFCell cellN = rowB.createCell(6);
-            cellN.setCellValue(new HSSFRichTextString(String.valueOf(order.getDiscount())));
+            cellN.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getDiscount()).replaceAll("\\.?0*$", "")));
             HSSFCell cellQ = rowB.createCell(5);
-            cellQ.setCellValue(new HSSFRichTextString(String.valueOf(order.getShipping())));
+            cellQ.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getShipping()).replaceAll("\\.?0*$", "")));
             HSSFCell cellO = rowB.createCell(7);
-            cellO.setCellValue(new HSSFRichTextString(String.valueOf(order.getOverAllDiscount())));
+            cellO.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getOverAllDiscount()).replaceAll("\\.?0*$", "")));
             HSSFCell cellP = rowB.createCell(8);
-            cellP.setCellValue(new HSSFRichTextString(String.valueOf(order.getTotalCost())));
+            cellP.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getTotalCost()).replaceAll("\\.?0*$", "")));
         }
         FileOutputStream fos = null;
         try {
@@ -192,7 +191,7 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
     private float getTotal() {
         float total = 0;
         for (FullOrder fullOrder : list) {
-            total += fullOrder.getTotalCost();
+            total += Float.parseFloat(fullOrder.getTotalCost());
         }
         return total;
     }
@@ -318,13 +317,13 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
         final String customerName = fullOrder.getUsername();
         final String address = fullOrder.getAddress();
         final String mobileNumber = fullOrder.getMobilePhone();
-        final float sum = fullOrder.getSum();
-        final float discount = fullOrder.getDiscount();
-        final float overAllDiscount = fullOrder.getOverAllDiscount();
+        final String sum = fullOrder.getSum();
+        final String discount = fullOrder.getDiscount();
+        final String overAllDiscount = fullOrder.getOverAllDiscount();
         final String phoneNumber = fullOrder.getPhoneNumber();
-        final float netCost = fullOrder.getTotalCost();
+        final String netCost = fullOrder.getTotalCost();
         final List<OrderProduct> list = fullOrder.getOrders();
-        final float shipping = fullOrder.getShipping();
+        final String shipping = fullOrder.getShipping();
         String ordersPrint = getOrdersPrintText(list);
         String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
         Log.d("blue","print method");
@@ -381,8 +380,8 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
             String productName = order.getProductName();
             String originalPrice = order.getOriginalPrice();
             String finalPrice  = order.getFinalPrice();
-            float orderedAmount = order.getOrdered();
-            String total = String.valueOf(orderedAmount * Float.parseFloat(finalPrice));
+            String orderedAmount = order.getOrdered();
+            String total = String.valueOf(Float.parseFloat(orderedAmount) * Float.parseFloat(finalPrice));
             ordersPrint +=
                     "[L]"+ total+"   [L]"+orderedAmount +"   [L]"+finalPrice+"   [L]"+originalPrice+"   [R]"+productName;
         }
