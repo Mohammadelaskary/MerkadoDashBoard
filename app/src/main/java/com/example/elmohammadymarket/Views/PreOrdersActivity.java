@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.elmohammadymarket.Adapters.DatesAdapter;
@@ -38,6 +39,7 @@ public class PreOrdersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityPreOrdersBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         fillyears();
         getDates();
         initDatesRecycler();

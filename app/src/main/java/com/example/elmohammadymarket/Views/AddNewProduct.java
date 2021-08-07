@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.bumptech.glide.Glide;
 import com.example.elmohammadymarket.Database.DepartmentNames;
@@ -80,7 +81,7 @@ public class AddNewProduct extends AppCompatActivity {
     ArrayAdapter<String> optionsAdapter;
     ArrayAdapter<String> subDepsAdapter;
     String depName, subdep, imageUrl, productName, price, unitWeight, discount, discountUnit, count;
-    boolean todaysOffer, mostSold;
+    boolean todaysOffer, mostSold,isAvailable,isVisible;
     String availableAmount,minimumOrderAmount;
     private StorageTask<UploadTask.TaskSnapshot> uploadTask;
 
@@ -89,6 +90,7 @@ public class AddNewProduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAddNewProductBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         getSupportActionBar().setTitle("إضافة منتج");
         storage = FirebaseStorage.getInstance().getReference("Images");
 
@@ -256,11 +258,14 @@ public class AddNewProduct extends AppCompatActivity {
             minimumOrderAmount = new BigDecimal(binding.minimumOrderAmount.getEditText().getText().toString().trim());
             todaysOffer = binding.todaysOffer.isChecked();
             mostSold = binding.mostSold.isChecked();
+            isAvailable = binding.isAvailable.isChecked();
+            isVisible = binding.isVisible.isChecked();
+
 
             if (binding.availableAmount.getEditText().getText().toString().trim().isEmpty())
                 availableAmount = BigDecimal.ZERO;
             product = new Product(department, subDep, productName, productPrice
-                    , unitWeight, discount, discountUnit, String.valueOf(availableAmount), todaysOffer, mostSold,String.valueOf(minimumOrderAmount),-1);
+                    , unitWeight, discount, discountUnit, String.valueOf(availableAmount), todaysOffer, mostSold,isVisible,isAvailable,String.valueOf(minimumOrderAmount),-1);
             product.setCount("0");
             boolean validateDiscount = true;
 
@@ -322,6 +327,8 @@ public class AddNewProduct extends AppCompatActivity {
             minimumOrderAmount = new BigDecimal(binding.minimumOrderAmount.getEditText().getText().toString().trim());
             boolean mostSold = binding.mostSold.isChecked();
             boolean todaysOffer = binding.todaysOffer.isChecked();
+            isAvailable = binding.isAvailable.isChecked();
+            isVisible = binding.isVisible.isChecked();
             if (binding.availableAmount.getEditText().getText().toString().isEmpty())
                 availableAmount = BigDecimal.ZERO;
 
@@ -340,6 +347,8 @@ public class AddNewProduct extends AppCompatActivity {
             map.put("subDep", subdep);
             map.put("count", count);
             map.put("minimumOrderAmount",minimumOrderAmount.toString());
+            map.put("available",isAvailable);
+            map.put("visible",isVisible);
             boolean validateDiscount = true;
 
             if (discountUnit.equals("جنيه") && !binding.discount.getEditText().getText().toString().isEmpty() && !binding.productPrice.getEditText().getText().toString().isEmpty()) {
@@ -652,10 +661,14 @@ public class AddNewProduct extends AppCompatActivity {
         count = bundle.getString("count");
         todaysOffer = bundle.getBoolean("todaysOffer");
         mostSold = bundle.getBoolean("mostSold");
+        isVisible = bundle.getBoolean("isVisible");
+        isAvailable = bundle.getBoolean("isAvailable");
         minimumOrderAmount = bundle.getString("minimumOrderAmount");
         binding.productName.getEditText().setText(productName);
         binding.productPrice.getEditText().setText(price);
         binding.unitWeight.getEditText().setText(unitWeight);
+        binding.isAvailable.setChecked(isAvailable);
+        binding.isVisible.setChecked(isVisible);
         if (new BigDecimal(availableAmount).equals(BigDecimal.ZERO)) {
             binding.availableAmount.getEditText().setText("");
         } else

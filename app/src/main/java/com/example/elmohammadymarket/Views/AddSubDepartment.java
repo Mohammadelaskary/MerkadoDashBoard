@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -62,6 +63,7 @@ public class AddSubDepartment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAddSubDepartmentBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         storage = FirebaseStorage.getInstance().getReference("Images");
         binding.subdepName.getEditText().addTextChangedListener(new TextWatcher() {
             @Override

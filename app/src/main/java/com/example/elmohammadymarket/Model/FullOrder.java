@@ -3,7 +3,7 @@ package com.example.elmohammadymarket.Model;
 import java.util.List;
 
 public class FullOrder {
-    private String id;
+    private int id;
     private String username;
     private String mobilePhone;
     private String phoneNumber;
@@ -73,11 +73,11 @@ public class FullOrder {
         this.userId = userId;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -14,6 +14,7 @@ import android.webkit.MimeTypeMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.elmohammadymarket.Adapters.AdsAdapter;
@@ -58,6 +59,7 @@ public class AddNewAd extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAddNewAdBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         getSupportActionBar().setTitle("الاعلانات");
         storage = FirebaseStorage.getInstance().getReference("Ads");
         adImages = new ArrayList<>();

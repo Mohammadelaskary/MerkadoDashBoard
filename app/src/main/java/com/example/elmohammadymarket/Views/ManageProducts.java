@@ -11,6 +11,7 @@ import android.widget.ExpandableListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.elmohammadymarket.Adapters.DepsAndSubdepsAdapter;
 import com.example.elmohammadymarket.Database.DepartmentNames;
@@ -37,6 +38,7 @@ public class ManageProducts extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityManageProductsBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(view);
         getSupportActionBar().setTitle("التعديل على المنتجات");
 

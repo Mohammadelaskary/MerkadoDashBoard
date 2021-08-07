@@ -6,6 +6,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.elmohammadymarket.Adapters.DiscountAdapter;
@@ -32,6 +33,7 @@ public class AddDiscount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityAddDiscountBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         discountList = new ArrayList<>();
 
         final DiscountAdapter adapter = new DiscountAdapter(this, discountList);

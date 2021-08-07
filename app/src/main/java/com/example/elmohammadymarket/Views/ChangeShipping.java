@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.elmohammadymarket.Model.Shipping;
 import com.example.elmohammadymarket.databinding.ActivityChangeShippingBinding;
@@ -26,6 +27,7 @@ public class ChangeShipping extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChangeShippingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         getCurrentShippingFee();
         Objects.requireNonNull(binding.shippingFee.getEditText()).addTextChangedListener(new TextWatcher() {
             @Override

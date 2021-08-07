@@ -13,6 +13,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, 0);
 
 
@@ -99,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, AddNewProduct.class);
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("add", true);
+                bundle.putBoolean("isVisible", true);
+                bundle.putBoolean("isAvailable", true);
                 bundle.putString("imageFileName", "");
                 bundle.putString("imageUrl", "");
                 bundle.putString("dep", "");

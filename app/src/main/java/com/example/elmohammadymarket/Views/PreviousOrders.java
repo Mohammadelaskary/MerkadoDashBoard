@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -34,7 +35,9 @@ import com.dantsu.escposprinter.exceptions.EscPosParserException;
 import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 import com.example.elmohammadymarket.Adapters.FullOrderAdapter;
 import com.example.elmohammadymarket.Model.FullOrder;
+import com.example.elmohammadymarket.Model.Order;
 import com.example.elmohammadymarket.Model.OrderProduct;
+import com.example.elmohammadymarket.Model.PharmacyOrder;
 import com.example.elmohammadymarket.OnCallClickListener;
 import com.example.elmohammadymarket.OnPrintClickListener;
 import com.example.elmohammadymarket.R;
@@ -68,17 +71,19 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
     private static final int REQUEST_CODE_LOCATION = 300 ;
     private static final int PRINT_REQUEST_CODE = 400 ;
     ActivityPreviousOrdersBinding binding;
-    List<FullOrder> list = new ArrayList<>();
+    List<Order> orders = new ArrayList<>();
     FullOrderAdapter adapter;
     String mobileNumber;
     String date;
     FullOrder order;
+    List<FullOrder> fullOrders = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityPreviousOrdersBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Objects.requireNonNull(getSupportActionBar()).setTitle("الطلبـــــات السابقة");
         binding.fullOrderRecycler.setVisibility(View.GONE);
         binding.ordersTitle.setVisibility(View.GONE);
@@ -87,7 +92,7 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
         date = intent.getStringExtra("date");
         if (isConnected()) {
             getData(date);
-            adapter = new FullOrderAdapter(this,list, false, this,this);
+            adapter = new FullOrderAdapter(this,orders, false, this,this);
             binding.fullOrderRecycler.setAdapter(adapter);
             binding.fullOrderRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
 
@@ -135,27 +140,50 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
         cellG.setCellValue(new HSSFRichTextString("الخصم علي المجموع"));
         HSSFCell cellH = rowA.createCell(8);
         cellH.setCellValue(new HSSFRichTextString("الحساب الكلي"));
-        for (int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < orders.size(); i++) {
+            Order order = orders.get(i);
+            FullOrder fullOrder = order.getFullOrder();
+            PharmacyOrder pharmacyOrder = order.getPharmacyOrders().get(0);
             HSSFRow rowB = firstSheet.createRow(i+1);
-            FullOrder order = list.get(i);
-            HSSFCell cellY = rowB.createCell(0);
-            cellY.setCellValue(new HSSFRichTextString(order.getUsername()));
-            HSSFCell cellZ = rowB.createCell(1);
-            cellZ.setCellValue(new HSSFRichTextString(order.getMobilePhone()));
-            HSSFCell cellX = rowB.createCell(2);
-            cellX.setCellValue(new HSSFRichTextString(order.getPhoneNumber()));
-            HSSFCell cellL = rowB.createCell(3);
-            cellL.setCellValue(new HSSFRichTextString(order.getAddress()));
-            HSSFCell cellM = rowB.createCell(4);
-            cellM.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getSum()).replaceAll("\\.?0*$", "")));
-            HSSFCell cellN = rowB.createCell(6);
-            cellN.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getDiscount()).replaceAll("\\.?0*$", "")));
-            HSSFCell cellQ = rowB.createCell(5);
-            cellQ.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getShipping()).replaceAll("\\.?0*$", "")));
-            HSSFCell cellO = rowB.createCell(7);
-            cellO.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getOverAllDiscount()).replaceAll("\\.?0*$", "")));
-            HSSFCell cellP = rowB.createCell(8);
-            cellP.setCellValue(new HSSFRichTextString(String.format("%.3f",order.getTotalCost()).replaceAll("\\.?0*$", "")));
+            if (fullOrder==null) {
+                HSSFCell cellY = rowB.createCell(0);
+                cellY.setCellValue(new HSSFRichTextString(pharmacyOrder.getShippingData().getUsername()));
+                HSSFCell cellZ = rowB.createCell(1);
+                cellZ.setCellValue(new HSSFRichTextString(pharmacyOrder.getShippingData().getMobileNumber()));
+                HSSFCell cellX = rowB.createCell(2);
+                cellX.setCellValue(new HSSFRichTextString(pharmacyOrder.getShippingData().getPhoneNumber()));
+                HSSFCell cellL = rowB.createCell(3);
+                cellL.setCellValue(new HSSFRichTextString(pharmacyOrder.getShippingData().getAddress()));
+                HSSFCell cellM = rowB.createCell(4);
+                cellM.setCellValue(new HSSFRichTextString(""));
+                HSSFCell cellN = rowB.createCell(6);
+                cellN.setCellValue(new HSSFRichTextString(""));
+                HSSFCell cellQ = rowB.createCell(5);
+                cellQ.setCellValue(new HSSFRichTextString(""));
+                HSSFCell cellO = rowB.createCell(7);
+                cellO.setCellValue(new HSSFRichTextString(""));
+                HSSFCell cellP = rowB.createCell(8);
+                cellP.setCellValue(new HSSFRichTextString(pharmacyOrder.getPharmacyCost()));
+            } else {
+                HSSFCell cellY = rowB.createCell(0);
+                cellY.setCellValue(new HSSFRichTextString(fullOrder.getUsername()));
+                HSSFCell cellZ = rowB.createCell(1);
+                cellZ.setCellValue(new HSSFRichTextString(fullOrder.getMobilePhone()));
+                HSSFCell cellX = rowB.createCell(2);
+                cellX.setCellValue(new HSSFRichTextString(fullOrder.getPhoneNumber()));
+                HSSFCell cellL = rowB.createCell(3);
+                cellL.setCellValue(new HSSFRichTextString(fullOrder.getAddress()));
+                HSSFCell cellM = rowB.createCell(4);
+                cellM.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getSum()).replaceAll("\\.?0*$", "")));
+                HSSFCell cellN = rowB.createCell(6);
+                cellN.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getDiscount()).replaceAll("\\.?0*$", "")));
+                HSSFCell cellQ = rowB.createCell(5);
+                cellQ.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getShipping()).replaceAll("\\.?0*$", "")));
+                HSSFCell cellO = rowB.createCell(7);
+                cellO.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getOverAllDiscount()).replaceAll("\\.?0*$", "")));
+                HSSFCell cellP = rowB.createCell(8);
+                cellP.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getTotalCost()).replaceAll("\\.?0*$", "")));
+            }
         }
         FileOutputStream fos = null;
         try {
@@ -190,8 +218,13 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
 
     private float getTotal() {
         float total = 0;
-        for (FullOrder fullOrder : list) {
-            total += Float.parseFloat(fullOrder.getTotalCost());
+        for (Order order : orders) {
+            FullOrder fullOrder = order.getFullOrder();
+            PharmacyOrder pharmacyOrder = order.getPharmacyOrders().get(0);
+            if (fullOrder!=null)
+                total += Float.parseFloat(fullOrder.getTotalCost());
+            else
+                total += Float.parseFloat(pharmacyOrder.getPharmacyCost());
         }
         return total;
     }
@@ -203,14 +236,18 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                list.clear();
+                orders.clear();
                 binding.progressBar.hide();
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        FullOrder fullOrder = snapshot.getValue(FullOrder.class);
-                        assert fullOrder != null;
-                        if (fullOrder.getDate().equals(date)) {
-                            list.add(fullOrder);
+                        Order order = snapshot.getValue(Order.class);
+                        if (order.getFullOrder() != null) {
+                                if (order.getFullOrder().getDate().equals(date) && !order.getFullOrder().getUserId().isEmpty()) {
+                                    orders.add(order);
+                            } else{
+                                if (order.getPharmacyOrders().get(0).getDate().equals(date)&&!order.getPharmacyOrders().get(0).getUserId().isEmpty())
+                                    orders.add(order);
+                            }
                         }
                     }
                     binding.fullOrderRecycler.setVisibility(View.VISIBLE);

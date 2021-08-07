@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -80,12 +81,29 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         final String count = productList.get(position).getCount();
         final boolean mostSold = productList.get(position).isMostSold();
         final boolean todaysOffer = productList.get(position).isTodaysOffer();
+        final boolean isVisible = productList.get(position).isVisible();
+        final boolean isAvailable = productList.get(position).isAvailable();
         int productPosition = productList.get(position).getPosition();
-        Log.d("position",productPosition+"");
+        Log.d("isAvailable",isAvailable+"");
         if (productPosition == -1){
             updatePosition(position,productName);
         }
         deletedItems = new ArrayList<>();
+
+        if (isAvailable){
+            holder.isAvailable.setText("متاح");
+            holder.isAvailable.setTextColor(Color.GREEN);
+        } else {
+            holder.isAvailable.setText("غير متاح");
+            holder.isAvailable.setTextColor(Color.GRAY);
+        }
+        if (isVisible){
+            holder.isVisible.setText("مرئي");
+            holder.isVisible.setTextColor(Color.GREEN);
+        } else {
+            holder.isVisible.setText("غير مرئي");
+            holder.isVisible.setTextColor(Color.GRAY);
+        }
         if (Float.parseFloat(availableAmount) == 0) {
             holder.unavailable.setVisibility(View.VISIBLE);
             holder.unavailableImage.setVisibility(View.VISIBLE);
@@ -211,6 +229,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
                 bundle.putString("count", count);
                 bundle.putBoolean("todaysOffer", todaysOffer);
                 bundle.putBoolean("mostSold", mostSold);
+                bundle.putBoolean("isAvailable", isAvailable);
+                bundle.putBoolean("isVisible", isVisible);
                 bundle.putString("minimumOrderAmount",minimumOrderAmount);
                 intent.putExtras(bundle);
                 context.startActivity(intent);
@@ -304,7 +324,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
     }
 
     static class ProductsViewholder extends RecyclerView.ViewHolder {
-        TextView discount, productName, productFinal, discountPrice, unavailable;
+        TextView discount, productName, productFinal, discountPrice, unavailable,isVisible,isAvailable;
         ImageView productImage, unavailableImage;
         Button delete;
 
@@ -318,6 +338,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
             unavailable = itemView.findViewById(R.id.unavailable);
             unavailableImage = itemView.findViewById(R.id.unavailable_image);
             delete = itemView.findViewById(R.id.delete);
+            isVisible = itemView.findViewById(R.id.isVisible);
+            isAvailable = itemView.findViewById(R.id.isAvailable);
 
 
         }

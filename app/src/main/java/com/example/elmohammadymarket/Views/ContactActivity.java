@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.elmohammadymarket.Model.Contact;
 import com.example.elmohammadymarket.databinding.ActivityContactBinding;
@@ -30,6 +31,7 @@ public class ContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityContactBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         getContactNumber();
         binding.phoneNumber.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
@@ -89,8 +91,8 @@ public class ContactActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 binding.progressBar.hide();
                 Contact contact = snapshot.getValue(Contact.class);
-                assert contact != null;
-                Objects.requireNonNull(binding.phoneNumber.getEditText()).setText(contact.getPhoneNumber());
+                if (contact!=null)
+                    Objects.requireNonNull(binding.phoneNumber.getEditText()).setText(contact.getPhoneNumber());
             }
 
             @Override

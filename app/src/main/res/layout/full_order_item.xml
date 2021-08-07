@@ -66,7 +66,6 @@
 
 
         </RelativeLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,15 +74,44 @@
             android:layout_marginTop="@dimen/_5sdp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:text="رقم الطلب :"
+                android:textSize="@dimen/_12ssp"
+                android:layout_marginEnd="@dimen/_5sdp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6"
+                android:textSize="@dimen/_16ssp"
+                android:text="01122288551"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:textColor="@color/colorPrimaryDark"
+                android:id="@+id/order_id" />
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/_5sdp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
                 android:text="اسم العميل:"
                 android:textSize="@dimen/_12ssp"
                 android:layout_marginEnd="@dimen/_5sdp" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="6"
                 android:textSize="@dimen/_16ssp"
                 android:text="01122288551"
                 android:layout_marginEnd="@dimen/_10sdp"
@@ -93,7 +121,7 @@
 
         </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -101,38 +129,36 @@
             android:layout_marginTop="@dimen/_5sdp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="5"
                 android:text="رقم التليفون المحمول:"
-                android:layout_alignParentStart="true"
                 android:textSize="@dimen/_12ssp"
                 android:id="@+id/mobile_phone_title"
-                android:layout_centerVertical="true"
                 android:maxLines="1"
                 android:layout_marginEnd="@dimen/_5sdp" />
 
             <TextView
-                android:layout_width="@dimen/_175sdp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="6"
                 android:textSize="@dimen/_16ssp"
                 android:text="10 شارع بيومي فراج متفرع من شارع عزام حدائق القبة "
-                android:layout_toEndOf="@id/mobile_phone_title"
                 android:textColor="@color/colorPrimaryDark"
                 android:id="@+id/mobile_phone" />
 
             <ImageButton
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:src="@drawable/ic_call"
                 android:background="@drawable/empty_edit_text"
                 android:id="@+id/call"
-                android:layout_marginEnd="@dimen/_10sdp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_marginEnd="@dimen/_3sdp" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -140,26 +166,24 @@
             android:layout_marginTop="@dimen/_5sdp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="العنـــــــــــــــــوان:"
-                android:layout_alignParentStart="true"
+                android:layout_weight="4"
+                android:text="العنوان:"
                 android:textSize="@dimen/_12ssp"
                 android:id="@+id/address_title"
-                android:layout_centerVertical="true"
-                android:maxLines="1"
                 android:layout_marginEnd="@dimen/_5sdp" />
 
             <TextView
-                android:layout_width="@dimen/_175sdp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="6"
                 android:textSize="@dimen/_16ssp"
                 android:text="10 شارع بيومي فراج متفرع من شارع عزام حدائق القبة "
-                android:layout_toEndOf="@id/address_title"
                 android:textColor="@color/colorPrimaryDark"
                 android:id="@+id/customer_address" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -169,15 +193,17 @@
             android:layout_marginTop="@dimen/_5sdp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="4"
                 android:text="رقم التليفون الأرضي:"
                 android:textSize="@dimen/_12ssp"
                 android:layout_marginEnd="@dimen/_5sdp" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="6"
                 android:textSize="@dimen/_16ssp"
                 android:text="01122288551"
                 android:layout_marginEnd="@dimen/_10sdp"
@@ -194,12 +220,53 @@
             android:textSize="@dimen/_12ssp"
             android:layout_gravity="start"
             android:layout_marginTop="@dimen/_5sdp" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/pharmacy_container"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pharmacy"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_margin="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="الصيدلية"
+                android:textSize="@dimen/_20ssp"
+                android:textColor="#fff"
+                app:icon="@drawable/ic__pharmacy"
+                app:iconGravity="start"
+                app:iconSize="@dimen/_20sdp"
+                app:iconPadding="@dimen/_10sdp"
+                android:background="@drawable/add_photo_button_background"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/number_of_pharmacy_items"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:text="1"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:translationZ="@dimen/_5sdp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/_11sdp"
+                android:layout_marginEnd="@dimen/_11sdp"
+                android:background="@drawable/new_request"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/orders" />
-
+    <LinearLayout
+        android:id="@+id/calculations"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/_32sdp"
@@ -341,7 +408,7 @@
 
 
         </LinearLayout>
-
+    </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/_32sdp"

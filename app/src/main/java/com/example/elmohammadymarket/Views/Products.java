@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -37,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Products extends AppCompatActivity {
     ActivityProductsBinding binding;
@@ -51,6 +53,7 @@ public class Products extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityProductsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         products = new ArrayList<>();
         Intent intent = getIntent();
         depName = intent.getStringExtra("depName");
@@ -124,7 +127,8 @@ public class Products extends AppCompatActivity {
                             adapter.notifyDataSetChanged();
                         }
                     }
-
+                    int numberOfProducts = products.size();
+                    Objects.requireNonNull(getSupportActionBar()).setTitle("عدد المنتجات : " + numberOfProducts);
 
 
                 } else {

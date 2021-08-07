@@ -8,6 +8,7 @@ import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.elmohammadymarket.R;
 import com.example.elmohammadymarket.databinding.ActivitySplashScreenBinding;
@@ -23,6 +24,7 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivitySplashScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Animation logoAnim = AnimationUtils.loadAnimation(this, R.anim.logo_splash);
         binding.logo.setAnimation(logoAnim);
         binding.name.setAnimation(logoAnim);

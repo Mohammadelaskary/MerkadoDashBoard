@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.elmohammadymarket.Model.PointsDiscount;
 import com.example.elmohammadymarket.databinding.ActivityRedeemPointsBinding;
@@ -28,6 +29,7 @@ public class RedeemPoints extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityRedeemPointsBinding.inflate(getLayoutInflater());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         setContentView(binding.getRoot());
         getPointsDiscount();
         getPointsDiscount2();

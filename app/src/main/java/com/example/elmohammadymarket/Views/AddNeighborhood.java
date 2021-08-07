@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.elmohammadymarket.Model.City;
 import com.example.elmohammadymarket.Model.Governorate;
@@ -42,6 +43,7 @@ public class AddNeighborhood extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         binding = ActivityAddNeighborhoodBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         database = FirebaseDatabase.getInstance();
 
 

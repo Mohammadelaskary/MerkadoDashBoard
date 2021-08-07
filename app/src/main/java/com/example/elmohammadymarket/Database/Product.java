@@ -24,9 +24,28 @@ public class Product  {
     private String count;
     private boolean mostSold;
     private boolean todaysOffer;
-
+    private boolean isVisible;
+    private boolean isAvailable;
     private String minimumOrderAmount;
     private int position;
+    @Ignore
+    public Product(String dep, String subDep, @NonNull String productName, String price, String unitWeight, String discount, String discountUnit, String availableAmount, boolean mostSold, boolean todaysOffer, boolean isVisible, boolean isAvailable, String minimumOrderAmount, int position) {
+
+        this.dep = dep;
+        this.subDep = subDep;
+        this.productName = productName;
+        this.price = price;
+        this.unitWeight = unitWeight;
+        this.discount = discount;
+        this.discountUnit = discountUnit;
+        this.availableAmount = availableAmount;
+        this.mostSold = mostSold;
+        this.todaysOffer = todaysOffer;
+        this.isVisible = isVisible;
+        this.isAvailable = isAvailable;
+        this.minimumOrderAmount = minimumOrderAmount;
+        this.position = position;
+    }
 
     @Ignore
     public Product(String dep, String subDep, @NotNull String productName, String price, String unitWeight, String discount, String discountUnit, String availableAmount, boolean todaysOffer, boolean mostSold,String minimumOrderAmount,int position) {
@@ -171,6 +190,19 @@ public class Product  {
         this.discountUnit = discountUnit;
     }
 
+    public boolean isVisible() {
+        return isVisible;
+    }
 
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
 
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
 }

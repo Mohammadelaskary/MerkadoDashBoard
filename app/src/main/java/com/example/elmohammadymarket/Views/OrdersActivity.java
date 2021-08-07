@@ -41,6 +41,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,7 +57,9 @@ import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 import com.example.elmohammadymarket.Adapters.FullOrderAdapter;
 import com.example.elmohammadymarket.Adapters.PrintOrderAdapter;
 import com.example.elmohammadymarket.Model.FullOrder;
+import com.example.elmohammadymarket.Model.Order;
 import com.example.elmohammadymarket.Model.OrderProduct;
+import com.example.elmohammadymarket.Model.PharmacyOrder;
 import com.example.elmohammadymarket.OnCallClickListener;
 import com.example.elmohammadymarket.OnPrintClickListener;
 import com.example.elmohammadymarket.R;
@@ -80,6 +83,8 @@ import net.posprinter.service.PosprinterService;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 import net.posprinter.utils.PosPrinterDev;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -105,6 +110,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         private static final int PERMISSION_BLUETOOTH = 650;
     ActivityOrdersBinding binding;
         List<FullOrder> list = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
         FullOrderAdapter adapter;
         PrintOrderAdapter printAdapter;
         String mobileNumber;
@@ -114,6 +120,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         String complaintPhoneNumber;
         BluetoothAdapter mBluetoothAdapter;
         String imagePath;
+        List<PharmacyOrder> pharmacyOrders = new ArrayList<>();
         private UUID applicationUUID = UUID
                 .fromString("00001101-0000-1000-8000-00805F9B34FB");
         private BluetoothSocket mBluetoothSocket;
@@ -143,7 +150,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             super.onCreate(savedInstanceState);
             binding = ActivityOrdersBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
-
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             getSupportActionBar().setTitle("الطلبـــــات");
             binding.fullOrderRecycler.setVisibility(View.GONE);
             binding.ordersTitle.setVisibility(View.GONE);
@@ -163,7 +170,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 
             if (isConnected()) {
                 getData();
-                adapter = new FullOrderAdapter(this, list, true, this, this);
+                adapter = new FullOrderAdapter(this, orders, true, this, this);
                 binding.fullOrderRecycler.setAdapter(adapter);
                 binding.fullOrderRecycler.setItemAnimator(new DefaultItemAnimator());
                 binding.fullOrderRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, true));
@@ -238,7 +245,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                             binding.ordersTitle.setVisibility(View.VISIBLE);
                         }
                     }
-
+                    getPharmacyOrders();
                 }
 
                 @Override
@@ -248,8 +255,70 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             });
         }
 
+    private void getPharmacyOrders() {
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("PharmacyOrders");
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    pharmacyOrders.clear();
+                    for (DataSnapshot dataSnapshot:snapshot.getChildren()){
+                        PharmacyOrder order = dataSnapshot.getValue(PharmacyOrder.class);
+                        pharmacyOrders.add(order);
+                    }
+                    addOrdersToList();
+                }
 
-        public boolean isConnected() {
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                }
+            });
+    }
+
+    private void addOrdersToList() {
+        List<Integer> ordersIds = new ArrayList<>();
+        for (FullOrder order:list){
+            int id = order.getId();
+            if (!ordersIds.contains(id)) {
+                ordersIds.add(id);
+            }
+        }
+
+        if (!pharmacyOrders.isEmpty()) {
+            for (PharmacyOrder pharmacyOrder : pharmacyOrders) {
+                int id = Integer.parseInt(pharmacyOrder.getOrderId());
+                if (!ordersIds.contains(id)) {
+                    ordersIds.add(id);
+                }
+            }
+        }
+        for (int id:ordersIds){
+            Order order = new Order(id);
+            for (FullOrder fullOrder : list) {
+                int orderId = fullOrder.getId();
+                if (orderId == id) {
+                    order.setFullOrder(fullOrder);
+                    break;
+                }
+            }
+            List<PharmacyOrder> currentPharmacyOrders = new ArrayList<>();
+            if (!pharmacyOrders.isEmpty()) {
+                for (PharmacyOrder pharmacyOrder : pharmacyOrders) {
+                    int orderId = Integer.parseInt(pharmacyOrder.getOrderId());
+                    if (orderId == id) {
+                        currentPharmacyOrders.add(pharmacyOrder);
+                    }
+                }
+            }
+            order.setPharmacyOrders(currentPharmacyOrders);
+            orders.add(order);
+            adapter.notifyDataSetChanged();
+        }
+
+    }
+
+
+    public boolean isConnected() {
             boolean connected = false;
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
@@ -599,35 +668,35 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL);
             } else {
 //                   Your code HERE
-                EscPosPrinter printer = new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(), 203, 78f, 32);
-                printer
-                        .printFormattedText(
-                                "[C] allah akbar\n"
-                                +"\n\n\n"
+//                EscPosPrinter printer = new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(), 203, 78f, 32);
+//                printer
+//                        .printFormattedText(
+//                                "[C] allah akbar\n"
+//                                +"\n\n\n"
+//
+//                        );
 
-                        );
+                //compress the bitmap
+                Bitmap b1 =convertGreyImg(receipt);
+                Bitmap b2=resizeImage(b1,576,false);
+//                printpicCode(b2);
 
-//                //compress the bitmap
-//                Bitmap b1 =convertGreyImg(receipt);
-//                Bitmap b2=resizeImage(b1,576,false);
-////                printpicCode(b2);
-//
-////                compress the bitmap
-//                Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
-//                Tiny.getInstance().source(b2).asBitmap().withOptions(options).compress(new BitmapCallback() {
-//                    @Override
-//                    public void callback(boolean isSuccess, Bitmap bitmap) {
-//                        if (isSuccess){
-////                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
-//
-//
-////                            Log.d("receipt",b2.toString());
-//                            printpicCode(resizeImage(bitmap,576,false));
-//                        }
-//
-//
-//                    }
-//                });
+//                compress the bitmap
+                Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
+                Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {
+                    @Override
+                    public void callback(boolean isSuccess, Bitmap bitmap) {
+                        if (isSuccess){
+//                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
+
+
+//                            Log.d("receipt",b2.toString());
+                            printpicCode(bitmap);
+                        }
+
+
+                    }
+                });
             }
 //            // tell the user data were sent
 //            Toast.makeText(this, "تم ارسال البيانات", Toast.LENGTH_SHORT).show();
@@ -655,7 +724,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                 list.add(DataForSendToPrinterPos80.printRasterBmp(
                         0,printBmp, BitmapToByteData.BmpType.Threshold, BitmapToByteData.AlignType.Center,576));
                 list.add(DataForSendToPrinterPos80.printAndFeedForward(3));
-//                list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
+                list.add(DataForSendToPrinterPos80.selectCutPagerModerAndCutPager(66,1));
                 return list;
             }
         });

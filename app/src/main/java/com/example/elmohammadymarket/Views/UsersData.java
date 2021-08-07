@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,13 +35,13 @@ public class UsersData extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityUsersDataBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         Objects.requireNonNull(getSupportActionBar()).setTitle("بيانات العملاء");
         if (isConnected()) {
             getData();
             adapter = new UsersAdapter(this, list);
             binding.usersRecycler.setAdapter(adapter);
             binding.usersRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-            binding.usersRecycler.setHasFixedSize(true);
         } else {
             binding.progressBar.hide();
             binding.noUsersText.setVisibility(View.VISIBLE);
