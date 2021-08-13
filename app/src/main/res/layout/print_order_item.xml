@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:layout_height="wrap_content"
-    android:layout_width="match_parent"
+    android:layout_width="@dimen/print_width"
     android:orientation="horizontal"
     android:layout_marginBottom="@dimen/_1sdp"
     android:layoutDirection="rtl"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
         android:id="@+id/product_name"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/_210sdp"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
         android:text="اسم الصنف"
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="@dimen/print_font_size"/>
     <TextView
         android:id="@+id/original_price"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/_70sdp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="قبل الخصم"
@@ -26,7 +25,7 @@
         android:textSize="@dimen/print_font_size"/>
     <TextView
         android:id="@+id/final_price"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/_70sdp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="بعد الخصم"
@@ -35,7 +34,7 @@
         android:textSize="@dimen/print_font_size"/>
     <TextView
         android:id="@+id/order_amount"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/_70sdp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="الكمية"
@@ -45,7 +44,7 @@
 
     <TextView
         android:id="@+id/total"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/_70sdp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="الاجمالي"

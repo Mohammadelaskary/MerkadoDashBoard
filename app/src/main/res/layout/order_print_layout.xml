@@ -1,28 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout android:orientation="vertical"
-    android:layout_width="match_parent"
+    android:layout_width="@dimen/print_width"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:layoutDirection="rtl"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <ImageView
-        android:src="@drawable/ic_mercado_logo_small"
-        android:layout_width="@dimen/image_width"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/print_margin"
-        />
+
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:text="ميركادو"
+        android:gravity="center"
         android:textColor="@color/black"
-        android:textSize="30sp"
+        android:textSize="@dimen/title_font_size"
         android:layout_marginTop="@dimen/_3sdp"/>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/print_margin"
@@ -46,7 +40,30 @@
             android:gravity="center"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="@dimen/print_margin"
+        android:layout_marginEnd="@dimen/print_margin">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="رقم الطلب:"
+            android:textColor="#444"
+            android:textSize="@dimen/print_font_size"
+            android:layout_marginStart="@dimen/print_margin"/>
+        <TextView
+            android:id="@+id/order_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:textSize="@dimen/print_font_size"
+            android:textColor="@color/black"
+            android:gravity="center"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/print_margin"
@@ -69,7 +86,7 @@
             android:gravity="center"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/print_margin"
@@ -92,7 +109,7 @@
             android:gravity="center"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/print_margin"
@@ -115,7 +132,7 @@
             android:gravity="center"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/print_margin"
@@ -138,12 +155,12 @@
             android:gravity="center"/>
     </LinearLayout>
     <View
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="@dimen/_1sdp"
         android:background="#222"
         android:layout_margin="@dimen/print_margin"/>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="@dimen/_1sdp"
@@ -192,30 +209,30 @@
             android:textSize="@dimen/print_font_size"/>
     </LinearLayout>
     <View
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="@dimen/_1sdp"
         android:background="#222"
         android:layout_margin="@dimen/print_margin"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/order_products"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/print_margin"
         android:layout_marginEnd="@dimen/print_margin"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
     <View
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="@dimen/_1sdp"
         android:background="#222"
         android:layout_margin="@dimen/print_margin"/>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/print_margin"
         android:layout_marginEnd="@dimen/print_margin">
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="420dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="المجموع"
@@ -225,7 +242,7 @@
 
         <TextView
             android:id="@+id/sum_print"
-            android:layout_width="0dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:gravity="center"
@@ -233,12 +250,12 @@
             android:textSize="@dimen/print_font_size" />
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/print_margin"
         android:layout_marginEnd="@dimen/print_margin">
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="420dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="الخصم"
@@ -248,7 +265,7 @@
 
         <TextView
             android:id="@+id/discount_print"
-            android:layout_width="0dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:gravity="center"
@@ -256,12 +273,12 @@
             android:textSize="@dimen/print_font_size" />
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/print_margin"
         android:layout_marginEnd="@dimen/print_margin">
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="420dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="الخصم علي المجموع"
@@ -270,7 +287,7 @@
             android:gravity="center"/>
         <TextView
             android:id="@+id/sum_discount_print"
-            android:layout_width="0dp"
+            android:layout_width="20dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
@@ -278,12 +295,12 @@
             android:textSize="@dimen/print_font_size"/>
     </LinearLayout>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/print_margin"
         android:layout_marginEnd="@dimen/print_margin">
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="420dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="التوصيل"
@@ -292,7 +309,7 @@
             android:gravity="center"/>
         <TextView
             android:id="@+id/shipping_fee_print"
-            android:layout_width="0dp"
+            android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
@@ -300,18 +317,18 @@
             android:textSize="@dimen/print_font_size"/>
     </LinearLayout>
     <View
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="@dimen/_1sdp"
         android:background="#222"
         android:layout_margin="@dimen/print_margin"/>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/print_margin"
         android:layout_marginEnd="@dimen/print_margin">
         <TextView
             android:id="@+id/total"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/_420sdp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="الاجمالي"
@@ -320,7 +337,7 @@
             android:gravity="center"/>
         <TextView
             android:id="@+id/total_print"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/_70sdp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
@@ -328,7 +345,7 @@
             android:textSize="@dimen/print_font_size"/>
     </LinearLayout>
     <View
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="@dimen/_1sdp"
         android:background="#222"
         android:layout_margin="@dimen/print_margin"/>
@@ -340,12 +357,12 @@
         android:textSize="@dimen/print_font_size"
        />
     <View
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="@dimen/_1sdp"
         android:background="#222"
         android:layout_margin="@dimen/print_margin"/>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/print_width"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/print_margin"
         android:layout_marginEnd="@dimen/print_margin"

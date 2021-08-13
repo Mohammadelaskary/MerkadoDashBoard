@@ -4,8 +4,29 @@ import java.util.List;
 
 public class Order {
     private int id;
+    private String userId;
+    private String date;
     private FullOrder fullOrder;
     private List<PharmacyOrder> pharmacyOrders;
+
+    public Order() {
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public Order(int id) {
         this.id = id;

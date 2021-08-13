@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,6 +30,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.printservice.PrintService;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +57,7 @@ import com.dantsu.escposprinter.exceptions.EscPosEncodingException;
 import com.dantsu.escposprinter.exceptions.EscPosParserException;
 import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 import com.example.elmohammadymarket.Adapters.FullOrderAdapter;
+import com.example.elmohammadymarket.Adapters.PharmacyAdapter;
 import com.example.elmohammadymarket.Adapters.PrintOrderAdapter;
 import com.example.elmohammadymarket.Model.FullOrder;
 import com.example.elmohammadymarket.Model.Order;
@@ -86,6 +89,7 @@ import net.posprinter.utils.PosPrinterDev;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -109,8 +113,8 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         private static final int READ_EXTERNAL = 450;
         private static final int PERMISSION_BLUETOOTH = 650;
     ActivityOrdersBinding binding;
-        List<FullOrder> list = new ArrayList<>();
         List<Order> orders = new ArrayList<>();
+        List<PharmacyOrder> pharmacyOrders = new ArrayList<>();
         FullOrderAdapter adapter;
         PrintOrderAdapter printAdapter;
         String mobileNumber;
@@ -120,7 +124,6 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         String complaintPhoneNumber;
         BluetoothAdapter mBluetoothAdapter;
         String imagePath;
-        List<PharmacyOrder> pharmacyOrders = new ArrayList<>();
         private UUID applicationUUID = UUID
                 .fromString("00001101-0000-1000-8000-00805F9B34FB");
         private BluetoothSocket mBluetoothSocket;
@@ -161,12 +164,12 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 
             getComplaintPhoneNumber();
 
-            try {
-                openBT();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            findBT();
+//            try {
+//                openBT();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            findBT();
 
             if (isConnected()) {
                 getData();
@@ -212,15 +215,16 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent=new Intent(this, PosprinterService.class);
-        bindService(intent, conn, BIND_AUTO_CREATE);
+//        Intent intent=new Intent(this, PosprinterService.class);
+//        bindService(intent, conn, BIND_AUTO_CREATE);
 
     }
 
     @Override
     protected void onStop() {
+//        unbindService(conn);
         super.onStop();
-        unbindService(conn);
+
     }
 
     void getData() {
@@ -228,24 +232,22 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             getRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    list.clear();
+                    orders.clear();
                     if (!dataSnapshot.exists()) {
                         binding.progressBar.hide();
                         binding.noOrdersText.setVisibility(View.VISIBLE);
                         binding.noOrdersText.setText("لا يوجد طلبات حاليا");
                     } else {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            FullOrder fullOrder = snapshot.getValue(FullOrder.class);
-                            list.add(fullOrder);
-                            Log.d(TAG, "onDataChange: orders" + fullOrder.getId());
-                            adapter.notifyDataSetChanged();
+                            Order order = snapshot.getValue(Order.class);
+                            orders.add(order);
                             binding.progressBar.hide();
                             binding.noOrders.setVisibility(View.GONE);
                             binding.fullOrderRecycler.setVisibility(View.VISIBLE);
                             binding.ordersTitle.setVisibility(View.VISIBLE);
                         }
                     }
-                    getPharmacyOrders();
+                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -255,67 +257,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             });
         }
 
-    private void getPharmacyOrders() {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("PharmacyOrders");
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                    pharmacyOrders.clear();
-                    for (DataSnapshot dataSnapshot:snapshot.getChildren()){
-                        PharmacyOrder order = dataSnapshot.getValue(PharmacyOrder.class);
-                        pharmacyOrders.add(order);
-                    }
-                    addOrdersToList();
-                }
 
-                @Override
-                public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-                }
-            });
-    }
-
-    private void addOrdersToList() {
-        List<Integer> ordersIds = new ArrayList<>();
-        for (FullOrder order:list){
-            int id = order.getId();
-            if (!ordersIds.contains(id)) {
-                ordersIds.add(id);
-            }
-        }
-
-        if (!pharmacyOrders.isEmpty()) {
-            for (PharmacyOrder pharmacyOrder : pharmacyOrders) {
-                int id = Integer.parseInt(pharmacyOrder.getOrderId());
-                if (!ordersIds.contains(id)) {
-                    ordersIds.add(id);
-                }
-            }
-        }
-        for (int id:ordersIds){
-            Order order = new Order(id);
-            for (FullOrder fullOrder : list) {
-                int orderId = fullOrder.getId();
-                if (orderId == id) {
-                    order.setFullOrder(fullOrder);
-                    break;
-                }
-            }
-            List<PharmacyOrder> currentPharmacyOrders = new ArrayList<>();
-            if (!pharmacyOrders.isEmpty()) {
-                for (PharmacyOrder pharmacyOrder : pharmacyOrders) {
-                    int orderId = Integer.parseInt(pharmacyOrder.getOrderId());
-                    if (orderId == id) {
-                        currentPharmacyOrders.add(pharmacyOrder);
-                    }
-                }
-            }
-            order.setPharmacyOrders(currentPharmacyOrders);
-            orders.add(order);
-            adapter.notifyDataSetChanged();
-        }
-
-    }
 
 
     public boolean isConnected() {
@@ -418,14 +360,16 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
         }
 
         private void shareData(LinearLayout layout, String mobileNumber) {
+            Intent whatsappIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+            ArrayList<Uri> files = new ArrayList<>();
             File file = saveBitMap(OrdersActivity.this, layout);    //which view you want to pass that view as parameter
             assert file != null;
             Uri imgUri = Uri.parse(file.getAbsolutePath());
-            Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+            files.add(imgUri); // uri of my bitmap image2
             whatsappIntent.setType("text/plain");
             whatsappIntent.setPackage("com.whatsapp");
             whatsappIntent.putExtra(Intent.EXTRA_TEXT, "رقم تليفون العميل " + mobileNumber);
-            whatsappIntent.putExtra(Intent.EXTRA_STREAM, imgUri);
+            whatsappIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM,files);
             whatsappIntent.setType("image/png");
             whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -461,7 +405,9 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             return pictureFile;
         }
 
-        private File saveBitMap(Context context, Bitmap bitmap) {
+
+
+            private File saveBitMap(Context context, Bitmap drawView) {
             File pictureFileDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Handcare");
             if (!pictureFileDir.exists()) {
                 boolean isDirectoryCreated = pictureFileDir.mkdirs();
@@ -471,10 +417,11 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             }
             String filename = pictureFileDir.getPath() + File.separator + System.currentTimeMillis() + ".png";
             File pictureFile = new File(filename);
+
             try {
                 pictureFile.createNewFile();
                 FileOutputStream oStream = new FileOutputStream(pictureFile);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, oStream);
+                drawView.compress(Bitmap.CompressFormat.PNG, 100, oStream);
                 oStream.flush();
                 oStream.close();
             } catch (IOException e) {
@@ -484,31 +431,6 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             scanGallery(context, pictureFile.getAbsolutePath());
             return pictureFile;
         }
-
-        //    private File saveBitMap(Context context, Bitmap drawView) {
-    //        File pictureFileDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Handcare");
-    //        if (!pictureFileDir.exists()) {
-    //            boolean isDirectoryCreated = pictureFileDir.mkdirs();
-    //            if (!isDirectoryCreated)
-    //                Log.i("ATG", "Can't create directory to save the image");
-    //            return null;
-    //        }
-    //        String filename = pictureFileDir.getPath() + File.separator + System.currentTimeMillis() + ".png";
-    //        File pictureFile = new File(filename);
-    //
-    //        try {
-    //            pictureFile.createNewFile();
-    //            FileOutputStream oStream = new FileOutputStream(pictureFile);
-    //            drawView.compress(Bitmap.CompressFormat.PNG, 100, oStream);
-    //            oStream.flush();
-    //            oStream.close();
-    //        } catch (IOException e) {
-    //            e.printStackTrace();
-    //            Log.i("TAG", "There was an issue saving the image.");
-    //        }
-    //        scanGallery(context, pictureFile.getAbsolutePath());
-    //        return pictureFile;
-    //    }
         private Bitmap getBitmapFromView(View view) {
 
             //Define a bitmap with the same size as the view
@@ -621,8 +543,6 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
                 if (checkSelfPermission(Manifest.permission.BLUETOOTH)
                         == PackageManager.PERMISSION_GRANTED) {
                     Log.d("blue", "permissiongranted");
-
-
                             printOrder(order);
 
 
@@ -636,12 +556,35 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             }
         }
 
+
+        private void shareBitmapToWhatsapp(Bitmap bitmap){
+            String pack = "pharmacy";
+            PackageManager pm = getPackageManager();
+            try {
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "طلبات الصيدلية", null);
+                Uri imageUri = Uri.parse(path);
+
+                @SuppressWarnings("unused")
+                PackageInfo info = pm.getPackageInfo(pack, PackageManager.GET_META_DATA);
+
+                Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+                whatsappIntent.setPackage("com.whatsapp");
+                whatsappIntent.putExtra(Intent.EXTRA_TEXT, "رقم تليفون العميل " + mobileNumber);
+                whatsappIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                whatsappIntent.setType("image/png");
+                whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(whatsappIntent);
+            } catch (Exception e) {
+                Log.e("Error on sharing", e + " ");
+                Toast.makeText(this, "تطبيق الواتس اب غير موجود علي الهاتف..", Toast.LENGTH_SHORT).show();
+            }
+        }
         private void printOrder(FullOrder fullOrder) throws EscPosConnectionException, EscPosParserException, EscPosEncodingException, EscPosBarcodeException {
-
-
-            Bitmap receipt = createClusterBitmap(fullOrder);
-
-//            printImage(receipt);
+            Bitmap receipt = createFullOrderClusterBitmap(fullOrder);
+            saveBitMap(getApplicationContext(),receipt);
+        //    printImage(receipt);
 //            Toast.makeText(this, "printed", Toast.LENGTH_SHORT).show();
 //            AlertDialog.Builder alertadd = new AlertDialog.Builder(this);
 //            LayoutInflater factory = LayoutInflater.from(this);
@@ -657,17 +600,17 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 //
 //            alertadd.show();
 //
-            String[] permissions = {
-                    Manifest.permission.BLUETOOTH,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            };
-            if (!hasPermissions(this, permissions)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_BLUETOOTH);
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL);
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL);
-            } else {
-//                   Your code HERE
+//            String[] permissions = {
+//                    Manifest.permission.BLUETOOTH,
+//                    Manifest.permission.READ_EXTERNAL_STORAGE,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            };
+//            if (!hasPermissions(this, permissions)) {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_BLUETOOTH);
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL);
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL);
+//            } else {
+//               //    Your code HERE
 //                EscPosPrinter printer = new EscPosPrinter(BluetoothPrintersConnections.selectFirstPaired(), 203, 78f, 32);
 //                printer
 //                        .printFormattedText(
@@ -677,32 +620,33 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 //                        );
 
                 //compress the bitmap
-                Bitmap b1 =convertGreyImg(receipt);
-                Bitmap b2=resizeImage(b1,576,false);
-//                printpicCode(b2);
+//                Bitmap b1 =convertGreyImg(receipt);
+//                Bitmap b2=resizeImage(b1,576,false);
+////                printpicCode(b2);
+//
+////                compress the bitmap
+//                Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
+//                Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {
+//                    @Override
+//                    public void callback(boolean isSuccess, Bitmap bitmap) {
+//                        if (isSuccess){
+////                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
+//
+//
+////                            Log.d("receipt",b2.toString());
+//                            printpicCode(bitmap);
+//                        }
+//
+//
+//                    }
+//                });
 
-//                compress the bitmap
-                Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
-                Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {
-                    @Override
-                    public void callback(boolean isSuccess, Bitmap bitmap) {
-                        if (isSuccess){
-//                            Toast.makeText(PosActivity.this,"bitmap: "+bitmap.getByteCount(),Toast.LENGTH_LONG).show();
-
-
-//                            Log.d("receipt",b2.toString());
-                            printpicCode(bitmap);
-                        }
-
-
-                    }
-                });
             }
 //            // tell the user data were sent
 //            Toast.makeText(this, "تم ارسال البيانات", Toast.LENGTH_SHORT).show();
 
 
-        }
+
     private void printpicCode(final Bitmap printBmp){
 
 
@@ -733,24 +677,24 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 
 
     }
-    //    private void shareReceipt(Bitmap receipt) {
-    //        File file = saveBitMap(OrdersActivity.this, receipt);    //which view you want to pass that view as parameter
-    //        assert file != null;
-    //        Uri imgUri = Uri.parse(file.getAbsolutePath());
-    //        Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
-    //        whatsappIntent.setType("text/plain");
-    //        whatsappIntent.setPackage("com.whatsapp");
-    //        whatsappIntent.putExtra(Intent.EXTRA_TEXT,    "رقم تليفون العميل " + mobileNumber);
-    //        whatsappIntent.putExtra(Intent.EXTRA_STREAM, imgUri);
-    //        whatsappIntent.setType("image/png");
-    //        whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-    //
-    //        try {
-    //            startActivity(whatsappIntent);
-    //        } catch (android.content.ActivityNotFoundException ex) {
-    //
-    //        }
-    //    }
+        private void shareReceipt(Bitmap receipt) {
+            File file = saveBitMap(OrdersActivity.this, receipt);    //which view you want to pass that view as parameter
+            assert file != null;
+            Uri imgUri = Uri.parse(file.getAbsolutePath());
+            Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+            whatsappIntent.setType("text/plain");
+            whatsappIntent.setPackage("com.whatsapp");
+            whatsappIntent.putExtra(Intent.EXTRA_TEXT,    "رقم تليفون العميل " + mobileNumber);
+            whatsappIntent.putExtra(Intent.EXTRA_STREAM, imgUri);
+            whatsappIntent.setType("image/png");
+            whatsappIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            try {
+                startActivity(whatsappIntent);
+            } catch (android.content.ActivityNotFoundException ex) {
+
+            }
+        }
 
     //    Bitmap getViewBitmap(View view)
     //    {
@@ -782,19 +726,19 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
     //    }
 
 
-        //    private String getOrdersPrintText(List<OrderProduct> list) {
-    //        String ordersPrint = "";
-    //        for (OrderProduct order : list ){
-    //            String productName = order.getProductName();
-    //            String originalPrice = order.getOriginalPrice();
-    //            String finalPrice  = order.getFinalPrice();
-    //            float orderedAmount = order.getOrdered();
-    //            String total = String.valueOf(orderedAmount * Float.parseFloat(finalPrice));
-    //            ordersPrint +=
-    //                    "[L]"+ total+"   [L]"+orderedAmount +"   [L]"+finalPrice+"   [L]"+originalPrice+"   [R]"+productName;
-    //        }
-    //        return ordersPrint;
-    //    }
+//            private String getOrdersPrintText(List<OrderProduct> list) {
+//            String ordersPrint = "";
+//            for (OrderProduct order : list ){
+//                String productName = order.getProductName();
+//                String originalPrice = order.getOriginalPrice();
+//                String finalPrice  = order.getFinalPrice();
+//                float orderedAmount = order.getOrdered();
+//                String total = String.valueOf(orderedAmount * Float.parseFloat(finalPrice));
+//                ordersPrint +=
+//                        "[L]"+ total+"   [L]"+orderedAmount +"   [L]"+finalPrice+"   [L]"+originalPrice+"   [R]"+productName;
+//            }
+//            return ordersPrint;
+//        }
         public static boolean hasPermissions(Context context, String... permissions) {
             if (context != null && permissions != null) {
                 for (String permission : permissions) {
@@ -806,9 +750,10 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             return true;
         }
 
-        private Bitmap createClusterBitmap(FullOrder fullOrder) {
+        private Bitmap createFullOrderClusterBitmap(FullOrder fullOrder) {
             View cluster = LayoutInflater.from(this).inflate(R.layout.order_print_layout,
                     null);
+            int id = fullOrder.getId();
             final String customerName = fullOrder.getUsername();
             final String address = fullOrder.getAddress();
             final String mobileNumber = fullOrder.getMobilePhone();
@@ -821,7 +766,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             final String shipping = fullOrder.getShipping();
             String timeStamp = new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(Calendar.getInstance().getTime());
 
-
+            TextView orderIdTv = cluster.findViewById(R.id.order_id);
             TextView dateTimePrint = cluster.findViewById(R.id.date_time_print);
             TextView customerNamePrint = cluster.findViewById(R.id.customer_name_print);
             TextView addressPrint = cluster.findViewById(R.id.address_print);
@@ -836,7 +781,7 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
             RecyclerView orders = cluster.findViewById(R.id.order_products);
             attachRecyclerViewToAdapter(list,orders);
 
-
+            orderIdTv.setText(String.valueOf(id));
             dateTimePrint.setText(timeStamp);
             customerNamePrint.setText(customerName);
             addressPrint.setText(address);
@@ -914,9 +859,6 @@ public class OrdersActivity extends AppCompatActivity implements OnCallClickList
 
         public void printImage(Bitmap bitmap) {
             Bitmap b1 = convertGreyImg(bitmap);
-
-
-
             //compress the bitmap
             Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
             Tiny.getInstance().source(b1).asBitmap().withOptions(options).compress(new BitmapCallback() {

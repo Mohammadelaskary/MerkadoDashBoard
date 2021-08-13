@@ -2,8 +2,12 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="print_font_size">3mm</dimen>
-    <dimen name="print_margin">.5mm</dimen>
-    <dimen name="print_width">78mm</dimen>
-    <dimen name="image_width">60mm</dimen>
+    <dimen name="print_font_size">@dimen/_19ssp</dimen>
+    <dimen name="title_font_size">@dimen/_35ssp</dimen>
+    <dimen name="print_margin">@dimen/_19sdp</dimen>
+    <dimen name="print_width">@dimen/_490sdp</dimen>
+    <dimen name="image_width">@dimen/_377sdp</dimen>
+    <dimen name="pharmacy_send_width">@dimen/_490sdp</dimen>
+
+
 </resources>

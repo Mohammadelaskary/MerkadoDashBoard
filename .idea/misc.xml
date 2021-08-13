@@ -3,7 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/drawable-xhdpi/ic_medicine.xml" value="0.1" />
         <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/layout/activity_orders.xml" value="0.13875" />
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/layout/full_order_item.xml" value="0.142578125" />
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/layout/order_print_layout.xml" value="0.101875" />
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/layout/pharmacy_layout.xml" value="0.153125" />
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/layout/pharmacy_order_layout.xml" value="0.153125" />
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/layout/pharmacy_order_send_layout.xml" value="0.153125" />
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/layout/print_order_item.xml" value="0.142578125" />
+        <entry key="..\:/Elaskary/ElMohammadyMarket/app/src/main/res/menu/orders_menu.xml" value="0.142578125" />
       </map>
     </option>
   </component>

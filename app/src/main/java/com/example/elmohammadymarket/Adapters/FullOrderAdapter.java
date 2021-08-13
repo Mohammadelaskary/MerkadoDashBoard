@@ -46,7 +46,9 @@ import com.example.elmohammadymarket.Model.PharmacyOrder;
 import com.example.elmohammadymarket.OnCallClickListener;
 import com.example.elmohammadymarket.OnPrintClickListener;
 import com.example.elmohammadymarket.R;
+import com.example.elmohammadymarket.Views.PharmacyDialog;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -77,7 +79,6 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
     private OnCallClickListener onCallClickListener;
     private OnPrintClickListener onPrintClickListener;
 
-    int id;
 
     public FullOrderAdapter(Context context,List<Order> orders, boolean newOrder, OnCallClickListener onCallClickListener,OnPrintClickListener onPrintClickListener) {
         this.context = context;
@@ -102,16 +103,18 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final FullOrderViewHolder holder, final int position) {
-      String customerName, time,date,address,mobileNumber,phoneNumber,sum ,discount,overAllDiscount,netCost,shipping,userId;
+    public void onBindViewHolder(@NonNull final FullOrderViewHolder holder, int position) {
+        int currentPosition = holder.getAdapterPosition();
+        String customerName, time,date,address,mobileNumber,phoneNumber,sum ,discount,overAllDiscount,netCost,shipping,userId;
         final boolean isDone,isSeen,isShiped;
-        FullOrder fullOrder = orders.get(position).getFullOrder();
-        List<PharmacyOrder> pharmacyOrders = orders.get(position).getPharmacyOrders();
-        List<OrderProduct> list = new ArrayList<>();
+        Order order = orders.get(currentPosition);
+        FullOrder fullOrder = order.getFullOrder();
+        List<PharmacyOrder> pharmacyOrders = order.getPharmacyOrders();
+        List<OrderProduct> orderProducts = new ArrayList<>();
         final int id;
-        id = orders.get(position).getId();
+        id = orders.get(currentPosition).getId();
         int numberOfPharmacyItems = 0;
-        if (!pharmacyOrders.isEmpty()) {
+        if (pharmacyOrders!=null) {
             numberOfPharmacyItems = pharmacyOrders.size();
             holder.pharmacyContainer.setVisibility(View.VISIBLE);
         } else {
@@ -129,14 +132,13 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
             overAllDiscount = fullOrder.getOverAllDiscount();
             phoneNumber = fullOrder.getPhoneNumber();
             netCost = fullOrder.getTotalCost();
-            list = fullOrder.getOrders();
+            orderProducts = fullOrder.getOrders();
             userId = fullOrder.getUserId();
             shipping = fullOrder.getShipping();
             isDone = fullOrder.isDone();
-            OrdersAdapter adapter = new OrdersAdapter(context, list);
+            OrdersAdapter adapter = new OrdersAdapter(context, orderProducts);
             holder.orders.setAdapter(adapter);
             holder.orders.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-            holder.orders.setHasFixedSize(true);
             holder.totalCost.setText(netCost);
             holder.shipping.setText(shipping);
             holder.sumText.setText(sum);
@@ -144,7 +146,13 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
             holder.overallDiscount.setText(overAllDiscount);
             holder.calculations.setVisibility(View.VISIBLE);
             fullOrder.setSeen(true);
-
+            updateOrder(fullOrder,id);
+            if (pharmacyOrders!=null) {
+                for (PharmacyOrder pharmacyOrder : pharmacyOrders) {
+                    pharmacyOrder.setSeen(true);
+                }
+                updatePharmacyOrder(id, pharmacyOrders);
+            }
         } else {
             customerName = pharmacyOrders.get(0).getShippingData().getUsername();
             time = pharmacyOrders.get(0).getTime();
@@ -155,10 +163,10 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
             isDone = pharmacyOrders.get(0).isDone();
             String pharmacyCost = pharmacyOrders.get(0).getPharmacyCost();
             userId = pharmacyOrders.get(0).getUserId();
-            for (PharmacyOrder order:pharmacyOrders){
-                order.setSeen(true);
-                markPharmacyOrderAsSeen(order.getOrderId());
+            for (PharmacyOrder pharmacyOrder:pharmacyOrders){
+                pharmacyOrder.setSeen(true);
             }
+            updatePharmacyOrder(id,pharmacyOrders);
             holder.calculations.setVisibility(View.GONE);
             holder.paymentTitle.setText("التوصيــــــــــــــــــــــــل:");
             holder.totalCost.setText(pharmacyCost);
@@ -172,67 +180,25 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
 
 
 
-        OrdersAdapter adapter = new OrdersAdapter(context, list);
+        OrdersAdapter adapter = new OrdersAdapter(context, orderProducts);
         holder.orders.setAdapter(adapter);
         holder.orders.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         holder.mobileNumber.setText(mobileNumber);
         holder.orderId.setText(String.valueOf(id));
         holder.call.setOnClickListener(view -> onCallClickListener.onCallClickListener(mobileNumber));
 
-        markAsSeen(id);
 
 
-        if (isDone) {
-            holder.done.setChecked(true);
-            holder.done.setEnabled(false);
+
+        if (!newOrder) {
+            holder.done.setVisibility(View.GONE);
             holder.sendOrder.setVisibility(View.GONE);
         } else {
             holder.done.setChecked(false);
             holder.done.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    DatabaseReference reference;
-                    reference = FirebaseDatabase.getInstance().getReference("Done orders");
-                        reference.push().setValue(orders.get(position));
-                        Query query = ref.child("Orders").orderByChild("id").equalTo(id);
-                        query.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                    snapshot.getRef().removeValue();
-                                }
-                            }
-
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    reference = FirebaseDatabase.getInstance().getReference("PharmacyOrders");
-                    Query query1 = reference.orderByChild("orderId").equalTo(id);
-                    if(!pharmacyOrders.isEmpty()){
-                        query1.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                for (DataSnapshot dataSnapshot:snapshot.getChildren()){
-                                    dataSnapshot.getRef().removeValue().addOnCompleteListener(task -> {
-                                        for (PharmacyOrder order:pharmacyOrders){
-                                            deleteImage(order.getImageUrl());
-                                        }
-                                    });
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-                            }
-                        });
-                    }
-
+                    moveOrderToDoneOrders(id, order);
                 }
             });
         }
@@ -246,13 +212,18 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                 menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()){
+                        final int itemId = item.getItemId();
+                        switch (itemId){
                             case R.id.send_order:{
                                 onCallClickListener.onSendClickListener(holder.orderLayout,  mobileNumber);
-                                Map<String, Object> shiped = new HashMap<>();
-                                shiped.put("shiped", true);
-                                if (fullOrder!=null)
-                                    updateOrder(shiped,id);
+                                if (fullOrder!=null) {
+                                    fullOrder.setShiped(true);
+                                    updateOrder(fullOrder,id);
+                                }
+                                for (PharmacyOrder pharmacyOrder:pharmacyOrders){
+                                    pharmacyOrder.setShiped(true);
+                                }
+                                updatePharmacyOrder(id,pharmacyOrders);
 
                             } break;
                             case R.id.print:{
@@ -263,6 +234,11 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                                 }
                             } break;
                             case R.id.delete_order:{
+                                if (pharmacyOrders!=null) {
+                                    for (PharmacyOrder order : pharmacyOrders) {
+                                        deleteImage(order.getImageFileName(),id);
+                                    }
+                                }
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                                 Query query = ref.child("Orders").orderByChild("id").equalTo(id);
                                 query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -270,7 +246,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                             snapshot.getRef().removeValue();
-                                            removeAt(position);
+                                            removeAt(currentPosition);
                                         }
                                     }
 
@@ -287,8 +263,12 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                 });
             }
         });
-
-        if (!userId.isEmpty()){
+        PharmacyDialog pharmacyDialog = new PharmacyDialog(context,android.R.style.Theme_Light,pharmacyOrders);
+        pharmacyDialog.setTitle("طلبات الصيدلية");
+        holder.openPharmacy.setOnClickListener(v->{
+            pharmacyDialog.show();
+        });
+        if (!userId.equals("")){
             holder.orderCanceled.setVisibility(View.GONE);
             holder.orderLayout.setEnabled(true);
         } else {
@@ -297,25 +277,18 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         }
 
 
-
     }
 
-    private void deleteImage(String imageUrl) {
-        FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
-        StorageReference photoRef = mFirebaseStorage.getReferenceFromUrl(imageUrl);
-        photoRef.delete();
-    }
-
-    private void markPharmacyOrderAsSeen(String orderId) {
-        final Map<String, Object> map = new HashMap<>();
-        map.put("seen", true);
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("PharmacyOrders");
-        Query query = reference.orderByChild("orderId").equalTo(orderId);
+    private void updatePharmacyOrder(int id, List<PharmacyOrder> pharmacyOrders) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Orders");
+        Query query = reference.orderByChild("id").equalTo(id);
+        Map<String,Object> pharmacyMap = new HashMap<>();
+        pharmacyMap.put("pharmacyOrders",pharmacyOrders);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                    dataSnapshot.getRef().updateChildren(map);
+                    dataSnapshot.getRef().updateChildren(pharmacyMap);
             }
 
             @Override
@@ -325,18 +298,17 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         });
     }
 
-
-    private void markAsSeen(int id) {
-        final Map<String, Object> map = new HashMap<>();
-        map.put("seen", true);
+    private void removePharmacy(int id) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Orders");
         Query query = reference.orderByChild("id").equalTo(id);
+        Map<String,Object> pharMap = new HashMap<>();
+        pharMap.put("pharmacyOrder",null);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                    dataSnapshot.getRef().updateChildren(map);
-                notifyDataSetChanged();
+                for (DataSnapshot dataSnapshot:snapshot.getChildren()){
+                    dataSnapshot.getRef().updateChildren(pharMap);
+                }
             }
 
             @Override
@@ -346,14 +318,56 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         });
     }
 
-    private void updateOrder(final Map<String, Object> map,int id) {
+    private void moveOrderToDoneOrders(int id,Order order) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference reference;
+        List<PharmacyOrder> pharmacyOrders = order.getPharmacyOrders();
+        reference = FirebaseDatabase.getInstance().getReference("Done orders");
+        reference.push().setValue(order);
+        Query query = ref.child("Orders").orderByChild("id").equalTo(id);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    snapshot.getRef().removeValue();
+                }
+                for (PharmacyOrder pharmacyOrder:pharmacyOrders){
+                    String imageFileName = pharmacyOrder.getImageFileName();
+                    deleteImage(imageFileName,id);
+                }
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void deleteImage(String filename,int id) {
+        String storageUrl = "Pharmacy/"+filename;
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(storageUrl);
+        storageReference.delete().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                removePharmacy(id);
+            }
+        });
+    }
+
+
+
+    private void updateOrder(FullOrder fullOrder,int id) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Orders");
         Query query = reference.orderByChild("id").equalTo(id);
+        Map<String,Object> fullOrderMap = new HashMap<>();
+        fullOrderMap.put("fullOrder",fullOrder);
+        Log.d("orderId",fullOrder.getId()+"");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                    dataSnapshot.getRef().updateChildren(map);
+                    dataSnapshot.getRef().updateChildren(fullOrderMap);
             }
 
             @Override
@@ -379,6 +393,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
         ImageButton deleteOrder;
         CardView cardView;
         ConstraintLayout pharmacyContainer;
+        MaterialButton openPharmacy;
 
         public FullOrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -406,6 +421,7 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
             calculations = itemView.findViewById(R.id.calculations);
             pharmacyContainer = itemView.findViewById(R.id.pharmacy_container);
             numberOfPharmacyItems = itemView.findViewById(R.id.number_of_pharmacy_items);
+            openPharmacy = itemView.findViewById(R.id.pharmacy);
         }
     }
 

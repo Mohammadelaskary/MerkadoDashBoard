@@ -6,7 +6,7 @@
         android:icon="@drawable/ic_send"
         app:showAsAction="never"/>
     <item android:id="@+id/print"
-        android:title="طباعة"
+        android:title="حفظ كصورة للطباعة"
         android:icon="@drawable/ic_print"
         app:showAsAction="never"/>
     <item android:id="@+id/delete_order"

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.elmohammadymarket.Adapters.DatesAdapter;
 import com.example.elmohammadymarket.Model.FullOrder;
+import com.example.elmohammadymarket.Model.Order;
 import com.example.elmohammadymarket.databinding.ActivityPreOrdersBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -92,7 +93,7 @@ public class PreOrdersActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dates.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    FullOrder order = dataSnapshot.getValue(FullOrder.class);
+                    Order order = dataSnapshot.getValue(Order.class);
                     assert order != null;
                     if (!dates.contains(order.getDate()))
                         dates.add(order.getDate());

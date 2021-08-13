@@ -46,6 +46,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -76,7 +77,6 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
     String mobileNumber;
     String date;
     FullOrder order;
-    List<FullOrder> fullOrders = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,15 +174,15 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
                 HSSFCell cellL = rowB.createCell(3);
                 cellL.setCellValue(new HSSFRichTextString(fullOrder.getAddress()));
                 HSSFCell cellM = rowB.createCell(4);
-                cellM.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getSum()).replaceAll("\\.?0*$", "")));
+                cellM.setCellValue(new HSSFRichTextString(fullOrder.getSum()));
                 HSSFCell cellN = rowB.createCell(6);
-                cellN.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getDiscount()).replaceAll("\\.?0*$", "")));
+                cellN.setCellValue(new HSSFRichTextString(fullOrder.getDiscount()));
                 HSSFCell cellQ = rowB.createCell(5);
-                cellQ.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getShipping()).replaceAll("\\.?0*$", "")));
+                cellQ.setCellValue(new HSSFRichTextString(fullOrder.getShipping()));
                 HSSFCell cellO = rowB.createCell(7);
-                cellO.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getOverAllDiscount()).replaceAll("\\.?0*$", "")));
+                cellO.setCellValue(new HSSFRichTextString(fullOrder.getOverAllDiscount()));
                 HSSFCell cellP = rowB.createCell(8);
-                cellP.setCellValue(new HSSFRichTextString(String.format("%.3f", fullOrder.getTotalCost()).replaceAll("\\.?0*$", "")));
+                cellP.setCellValue(new HSSFRichTextString(fullOrder.getTotalCost()));
             }
         }
         FileOutputStream fos = null;
@@ -232,8 +232,8 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
 
     void getData(final String date) {
         DatabaseReference getRef = FirebaseDatabase.getInstance().getReference("Done orders");
-        getRef.addValueEventListener(new ValueEventListener() {
-
+        Query query = getRef.orderByChild("date").equalTo(date);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 orders.clear();
@@ -241,21 +241,13 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Order order = snapshot.getValue(Order.class);
-                        if (order.getFullOrder() != null) {
-                                if (order.getFullOrder().getDate().equals(date) && !order.getFullOrder().getUserId().isEmpty()) {
-                                    orders.add(order);
-                            } else{
-                                if (order.getPharmacyOrders().get(0).getDate().equals(date)&&!order.getPharmacyOrders().get(0).getUserId().isEmpty())
-                                    orders.add(order);
-                            }
-                        }
+                        orders.add(order);
                     }
                     binding.fullOrderRecycler.setVisibility(View.VISIBLE);
                     binding.ordersTitle.setVisibility(View.VISIBLE);
                     binding.total.setText(String.valueOf(getTotal()));
-                    adapter.notifyDataSetChanged();
                 }
-
+                adapter.notifyDataSetChanged();
             }
 
             @Override
