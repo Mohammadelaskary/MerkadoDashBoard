@@ -79,7 +79,7 @@ public class ChangeShipping extends AppCompatActivity {
                 if (snapshot.exists()) {
                     Shipping shipping = snapshot.getValue(Shipping.class);
                     assert shipping != null;
-                    binding.currentShippingFee.setText(String.format("%.3f",shipping.getShippingFee()).replaceAll("\\.?0*$", "")+"جنيه");
+                    binding.currentShippingFee.setText(shipping.getShippingFee());
                     binding.currentShippingFee.setVisibility(View.VISIBLE);
                 } else {
                     binding.currentShippingFee.setText("10 جنيه");

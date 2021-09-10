@@ -331,9 +331,11 @@ public class FullOrderAdapter extends RecyclerView.Adapter<FullOrderAdapter.Full
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     snapshot.getRef().removeValue();
                 }
-                for (PharmacyOrder pharmacyOrder:pharmacyOrders){
-                    String imageFileName = pharmacyOrder.getImageFileName();
-                    deleteImage(imageFileName,id);
+                if (pharmacyOrders!=null) {
+                    for (PharmacyOrder pharmacyOrder : pharmacyOrders) {
+                        String imageFileName = pharmacyOrder.getImageFileName();
+                        deleteImage(imageFileName, id);
+                    }
                 }
             }
 
