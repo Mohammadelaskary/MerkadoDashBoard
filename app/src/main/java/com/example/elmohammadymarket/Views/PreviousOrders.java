@@ -220,11 +220,16 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
         float total = 0;
         for (Order order : orders) {
             FullOrder fullOrder = order.getFullOrder();
-            PharmacyOrder pharmacyOrder = order.getPharmacyOrders().get(0);
+            PharmacyOrder pharmacyOrder = null;
+            if (order.getPharmacyOrders()!=null)
+                pharmacyOrder = order.getPharmacyOrders().get(0);
             if (fullOrder!=null)
                 total += Float.parseFloat(fullOrder.getTotalCost());
-            else
+            else{
+                if (pharmacyOrder!=null)
                 total += Float.parseFloat(pharmacyOrder.getPharmacyCost());
+            }
+
         }
         return total;
     }
