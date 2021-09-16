@@ -143,7 +143,11 @@ public class PreviousOrders extends AppCompatActivity implements OnCallClickList
         for (int i = 0; i < orders.size(); i++) {
             Order order = orders.get(i);
             FullOrder fullOrder = order.getFullOrder();
-            PharmacyOrder pharmacyOrder = order.getPharmacyOrders().get(0);
+            PharmacyOrder pharmacyOrder = null;
+            if(order.getPharmacyOrders()!=null){
+                pharmacyOrder = order.getPharmacyOrders().get(0);
+            }
+
             HSSFRow rowB = firstSheet.createRow(i+1);
             if (fullOrder==null) {
                 HSSFCell cellY = rowB.createCell(0);
